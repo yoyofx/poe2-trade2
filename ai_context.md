@@ -1,0 +1,71 @@
+# Chat Conversation
+
+Note: _This is purely the output of the chat conversation and does not contain any raw data, codebase snippets, etc. used to generate the output._
+
+### User Input
+
+# poe2-trade2
+
+## 项目名称: 流放2网购助手
+
+## 目标:
+实现一个流放之路2网页集市的chrome插件,参考网址如下:https://poe.game.qq.com/trade2/search/poe2/%E6%B7%B1%E6%B8%8A%E5%B4%9B%E8%B5%B7
+### 实现内容:
+整体UI 界面采用 Sidebar UI, 显示并占据整体页面的最后右侧, 可收缩成一个右侧的小图标,点击打开 sidebar ui , sidebar uiu关闭后,只保留这个小图标.
+### 具体功能如下:
+1. 物品收藏功能 ,物品收藏可以手动创建和删除目录,目录采用树型显示. 在集市物品的最左侧排列 收藏按钮,显示为一个五角星. 点击收藏按钮,默认进行当前选择目录下,收藏内容为物品属性/通货价格等信息. 并能触发点击 Travel to Hideout 按钮的功能.
+2. 搜索存储,同收藏功能,可以手动创建和删除目录,目录采用树型显示. 将当前页面地址保存在当前目录中,并可以进行备注和删除,保存的搜索默认显示备注内容.
+
+*Listed directory [poe2-trade-extension](file:///Users/yoyofx/Documents/github/poe2/poe2-trade-extension) *
+
+*Edited relevant file*
+
+*Listed directory [poe2](file:///Users/yoyofx/Documents/github/poe2) *
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+### User Input
+
+This is a system-generated message that is sent due to the user's review policy. Proceed with the decision that you think is the most optimal here.
+
+*User accepted the command `mkdir -p /Users/yoyofx/Documents/github/poe2/poe2-trade-extension/content`*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Viewed [content.js](file:///Users/yoyofx/Documents/github/poe2/poe2-trade-extension/content/content.js) *
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
+
+*Edited relevant file*
