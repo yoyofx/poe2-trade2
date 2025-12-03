@@ -144,6 +144,9 @@ class TreeView {
         const label = document.createElement('span');
         label.className = 'tree-label';
         label.textContent = node.name;
+        if (node.data && node.data.nameCss) {
+            label.style.cssText = node.data.nameCss;
+        }
 
         // Actions
         const actions = document.createElement('div');

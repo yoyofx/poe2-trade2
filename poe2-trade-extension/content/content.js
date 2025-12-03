@@ -83,6 +83,7 @@ function extractItemData(row) {
 
     return {
         name: (nameEl ? nameEl.innerText : '') + ' ' + (typeEl ? typeEl.innerText : '') || 'Unknown Item',
+        nameCss: nameEl ? `color: ${window.getComputedStyle(nameEl).color}` : '',
         price: priceEl ? priceEl.innerText : 'Unknown Price',
         playerName: playerEl ? playerEl.innerText : null,
         whisperMessage: whisperMessage,
