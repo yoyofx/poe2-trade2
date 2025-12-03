@@ -1,6 +1,6 @@
 # poe2-trade2
 
-## 项目名称: 流放
+## 项目名称: 流放2网购助手
 
 ## 目标:
 实现一个流放之路2网页集市的chrome插件,参考网址如下:https://poe.game.qq.com/trade2/search/poe2/%E6%B7%B1%E6%B8%8A%E5%B4%9B%E8%B5%B7
