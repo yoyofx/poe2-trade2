@@ -124,7 +124,7 @@ class TreeView {
             if (node.data && node.data.url) {
                 // It's a saved search, navigate to it?
                 // Or maybe just show details. For now, let's just select.
-                if (confirm('Go to saved search?')) {
+                if (confirm('前往已保存的搜索?')) {
                     window.location.href = node.data.url;
                 }
             }
@@ -157,11 +157,11 @@ class TreeView {
                 const whisperBtn = document.createElement('button');
                 whisperBtn.className = 'tree-action-btn';
                 whisperBtn.innerHTML = '💬';
-                whisperBtn.title = 'Copy Whisper';
+                whisperBtn.title = '复制密语';
                 whisperBtn.onclick = (e) => {
                     e.stopPropagation();
                     navigator.clipboard.writeText(node.data.whisperMessage).then(() => {
-                        alert('Whisper copied!');
+                        alert('密语已复制!');
                     });
                 };
                 actions.appendChild(whisperBtn);
@@ -171,12 +171,12 @@ class TreeView {
                 const hideoutBtn = document.createElement('button');
                 hideoutBtn.className = 'tree-action-btn';
                 hideoutBtn.innerHTML = '🏠';
-                hideoutBtn.title = 'Copy /hideout command';
+                hideoutBtn.title = '复制 /hideout 命令';
                 hideoutBtn.onclick = (e) => {
                     e.stopPropagation();
                     const cmd = `/hideout ${node.data.playerName}`;
                     navigator.clipboard.writeText(cmd).then(() => {
-                        alert('Copied: ' + cmd);
+                        alert('已复制: ' + cmd);
                     });
                 };
                 actions.appendChild(hideoutBtn);
@@ -188,7 +188,7 @@ class TreeView {
         deleteBtn.innerHTML = '🗑';
         deleteBtn.onclick = (e) => {
             e.stopPropagation();
-            if (confirm('Delete this item?')) {
+            if (confirm('删除此项目?')) {
                 this.deleteNode(node.id);
             }
         };
@@ -234,24 +234,24 @@ class Sidebar {
 
     createSidebarElement() {
         const sidebarHTML = `
-      <div id="poe2-sidebar-toggle" title="Toggle Sidebar">
+      <div id="poe2-sidebar-toggle" title="切换侧边栏">
         <span>★</span>
       </div>
       <div class="sidebar-header">
-        <span>PoE 2 Helper</span>
+        <span>流放之路2助手</span>
       </div>
       <div class="sidebar-tabs">
-        <div class="sidebar-tab active" data-tab="collections">Collections</div>
-        <div class="sidebar-tab" data-tab="searches">Searches</div>
+        <div class="sidebar-tab active" data-tab="collections">物品收藏</div>
+        <div class="sidebar-tab" data-tab="searches">搜索存储</div>
       </div>
       <div class="sidebar-content">
         <div id="tab-collections" class="tab-pane active">
-          <button id="btn-add-folder-collection" class="btn-primary">+ New Folder</button>
+          <button id="btn-add-folder-collection" class="btn-primary">+ 新建文件夹</button>
           <div id="collections-tree" class="tree-root"></div>
         </div>
         <div id="tab-searches" class="tab-pane">
-          <button id="btn-add-folder-search" class="btn-primary">+ New Folder</button>
-          <button id="btn-save-search" class="btn-primary">Save Current Search</button>
+          <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
+          <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
           <div id="searches-tree" class="tree-root"></div>
         </div>
       </div>
@@ -279,21 +279,21 @@ class Sidebar {
 
         // Buttons
         document.getElementById('btn-add-folder-collection').addEventListener('click', () => {
-            const name = prompt('Folder Name:');
+            const name = prompt('文件夹名称:');
             if (name) {
                 this.collectionsTree.addFolder(name);
             }
         });
 
         document.getElementById('btn-add-folder-search').addEventListener('click', () => {
-            const name = prompt('Folder Name:');
+            const name = prompt('文件夹名称:');
             if (name) {
                 this.searchesTree.addFolder(name);
             }
         });
 
         document.getElementById('btn-save-search').addEventListener('click', () => {
-            const name = prompt('Search Name (optional):') || 'Saved Search';
+            const name = prompt('搜索名称(可选):') || '已保存的搜索';
             const url = window.location.href;
             this.searchesTree.addItem({ name: name, url: url });
         });

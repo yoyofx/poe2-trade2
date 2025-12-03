@@ -38,7 +38,7 @@ function injectStarButton(row) {
         const starBtn = document.createElement('div');
         starBtn.className = 'poe2-trade-star-btn';
         starBtn.innerHTML = '☆'; // Hollow star
-        starBtn.title = 'Add to Collection';
+        starBtn.title = '添加到收藏';
 
         starBtn.addEventListener('click', (e) => {
             e.stopPropagation();
