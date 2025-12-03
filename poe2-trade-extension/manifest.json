@@ -1,0 +1,35 @@
+{
+    "manifest_version": 3,
+    "name": "PoE 2 Trade Helper",
+    "version": "1.0",
+    "description": "A sidebar assistant for PoE 2 Trade site.",
+    "permissions": [
+        "storage",
+        "activeTab"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://poe.game.qq.com/trade2/*"
+            ],
+            "js": [
+                "content/sidebar.js",
+                "content/content.js"
+            ],
+            "css": [
+                "content/content.css"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "content/content.css"
+            ],
+            "matches": [
+                "*://poe.game.qq.com/*"
+            ]
+        }
+    ]
+}
