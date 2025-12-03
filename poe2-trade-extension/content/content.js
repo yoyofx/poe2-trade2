@@ -81,6 +81,8 @@ function extractItemData(row) {
     // Fallback: Use full text if specific elements aren't found
     const fullText = row.innerText.split('\n').filter(line => line.trim() !== '').join(' | ');
 
+    const affixes = Array.from(row.querySelectorAll('.explicitMod')).map(el => parseAffix(el.innerText));
+
     return {
         name: (nameEl ? nameEl.innerText : '') + ' ' + (typeEl ? typeEl.innerText : '') || 'Unknown Item',
         nameCss: nameEl ? `color: ${window.getComputedStyle(nameEl).color}` : '',
@@ -88,6 +90,34 @@ function extractItemData(row) {
         playerName: playerEl ? playerEl.innerText : null,
         whisperMessage: whisperMessage,
         fullText: fullText,
+        affixes: affixes,
         timestamp: Date.now()
+    };
+}
+
+function parseAffix(text) {
+    const parts = text.split('\n');
+    const tagLine = parts[0];
+    const content = parts.slice(1).join('\n');
+
+    const tags = tagLine.split('+').map(t => t.trim());
+    const affixChildren = tags.map(tag => {
+        const match = tag.match(/([SP])(\d+)/);
+        if (match) {
+            return {
+                isPrefix: match[1] === 'S',
+                tier: parseInt(match[2], 10)
+            };
+        }
+        return null;
+    }).filter(Boolean);
+
+    const firstChild = affixChildren[0] || { isPrefix: false, tier: 0 };
+
+    return {
+        isPrefix: firstChild.isPrefix,
+        tier: firstChild.tier,
+        content: content,
+        affixChildren: affixChildren
     };
 }
