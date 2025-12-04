@@ -38,7 +38,7 @@ function injectStarButton(row) {
         const starBtn = document.createElement('div');
         starBtn.className = 'poe2-trade-star-btn';
         starBtn.innerHTML = '☆'; // Hollow star
-        starBtn.title = '添加到收藏';
+        starBtn.setAttribute('data-tooltip', '将此物品添加到流放2网购助手中');
 
         starBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -71,7 +71,7 @@ function extractItemData(row) {
 
     const nameEl = row.querySelector('.itemName') || row.querySelector('.name');
     const typeEl = row.querySelector('.itemType') || row.querySelector('.typeLine');
-    const priceEl = row.querySelector('.priceBlock') || row.querySelector('.currency-text');
+    const priceEl = row.querySelector('.priceBlock') || row.querySelector('.price');
     const playerEl = row.querySelector('.posted-by');
 
     // Try to find whisper button/data

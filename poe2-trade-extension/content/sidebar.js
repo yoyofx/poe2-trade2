@@ -144,8 +144,36 @@ class TreeView {
         const label = document.createElement('span');
         label.className = 'tree-label';
         label.textContent = node.name;
-        if (node.data && node.data.nameCss) {
-            label.style.cssText = node.data.nameCss;
+        // Item Details (Price & Affixes)
+        if (node.type === 'item' && node.data) {
+            const details = document.createElement('div');
+            details.className = 'item-details';
+
+            if (node.data.price) {
+                const price = document.createElement('div');
+                price.className = 'item-price';
+                price.textContent = node.data.price;
+                details.appendChild(price);
+            }
+
+            if (node.data.affixes && node.data.affixes.length > 0) {
+                const affixesList = document.createElement('div');
+                affixesList.className = 'item-affixes';
+                node.data.affixes.forEach(affix => {
+                    const affixEl = document.createElement('div');
+                    affixEl.className = 'item-affix';
+                    // affix is an object { isPrefix, tier, content, affixChildren }
+                    // We can format it nicely.
+                    let text = affix.content;
+                    if (affix.tier > 0) {
+                        text = `[T${affix.tier}] ${text}`;
+                    }
+                    affixEl.textContent = text;
+                    affixesList.appendChild(affixEl);
+                });
+                details.appendChild(affixesList);
+            }
+            label.appendChild(details);
         }
 
         // Actions
