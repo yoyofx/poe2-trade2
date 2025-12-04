@@ -66,8 +66,12 @@ function toggleStar(btn, row) {
 }
 
 function extractItemData(row) {
+
     // Attempt to extract relevant data
     // This is highly dependent on the actual DOM structure of PoE Trade site
+    // get row attribate , data-id
+    const itemid = row.getAttribute('data-id');
+    console.log(itemid)
 
     const nameEl = row.querySelector('.itemName') || row.querySelector('.name');
     const typeEl = row.querySelector('.itemType') || row.querySelector('.typeLine');
@@ -75,8 +79,7 @@ function extractItemData(row) {
     const playerEl = row.querySelector('.posted-by');
 
     // Try to find whisper button/data
-    const whisperBtn = row.querySelector('.whisper-btn') || row.querySelector('button.contact');
-    const whisperMessage = whisperBtn ? whisperBtn.getAttribute('data-whisper') : null;
+    const whisperBtn = row.querySelector('.direct-btn');
 
     // Fallback: Use full text if specific elements aren't found
     const fullText = row.innerText.split('\n').filter(line => line.trim() !== '').join(' | ');
@@ -84,11 +87,12 @@ function extractItemData(row) {
     const affixes = Array.from(row.querySelectorAll('.explicitMod')).map(el => parseAffix(el.innerText));
 
     return {
+        id: itemid,
         name: (nameEl ? nameEl.innerText : '') + ' ' + (typeEl ? typeEl.innerText : '') || 'Unknown Item',
         nameCss: nameEl ? `color: ${window.getComputedStyle(nameEl).color}` : '',
         price: priceEl ? priceEl.innerText : 'Unknown Price',
         playerName: playerEl ? playerEl.innerText : null,
-        whisperMessage: whisperMessage,
+        whisperBtn: whisperBtn,
         fullText: fullText,
         affixes: affixes,
         timestamp: Date.now()

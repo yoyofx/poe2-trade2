@@ -181,34 +181,31 @@ class TreeView {
         actions.className = 'tree-actions';
 
         if (node.type === 'item' && node.data) {
-            if (node.data.whisperMessage) {
+            if (node.data.id) {
                 const whisperBtn = document.createElement('button');
                 whisperBtn.className = 'tree-action-btn';
-                whisperBtn.innerHTML = '💬';
-                whisperBtn.title = '复制密语';
+                whisperBtn.innerHTML = '🏠';
+                whisperBtn.title = '前往藏身处';
                 whisperBtn.onclick = (e) => {
                     e.stopPropagation();
-                    navigator.clipboard.writeText(node.data.whisperMessage).then(() => {
-                        alert('密语已复制!');
-                    });
+                    // http get https://poe.game.qq.com/api/trade2/fetch/{itemid}?query=GvjbmPOUb&realm=poe2
+                    const url = `https://poe.game.qq.com/api/trade2/fetch/${node.data.id}?query=GvjbmPOUb&realm=poe2`;
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.result.length > 0) {
+                                const whisper_token = data.result[0].listing.hideout_token;
+                                alert('前往藏身处: ' + whisper_token);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching item:', error);
+                        });
+
                 };
                 actions.appendChild(whisperBtn);
             }
 
-            if (node.data.playerName) {
-                const hideoutBtn = document.createElement('button');
-                hideoutBtn.className = 'tree-action-btn';
-                hideoutBtn.innerHTML = '🏠';
-                hideoutBtn.title = '复制 /hideout 命令';
-                hideoutBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    const cmd = `/hideout ${node.data.playerName}`;
-                    navigator.clipboard.writeText(cmd).then(() => {
-                        alert('已复制: ' + cmd);
-                    });
-                };
-                actions.appendChild(hideoutBtn);
-            }
         }
 
         const deleteBtn = document.createElement('button');
