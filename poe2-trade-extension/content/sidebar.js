@@ -188,14 +188,49 @@ class TreeView {
                 whisperBtn.title = '前往藏身处';
                 whisperBtn.onclick = (e) => {
                     e.stopPropagation();
-                    // http get https://poe.game.qq.com/api/trade2/fetch/{itemid}?query=GvjbmPOUb&realm=poe2
+                    //go to the hideout of the item of url
+                    const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper'
+
                     const url = `https://poe.game.qq.com/api/trade2/fetch/${node.data.id}?query=GvjbmPOUb&realm=poe2`;
                     fetch(url)
                         .then(response => response.json())
                         .then(data => {
                             if (data.result.length > 0) {
                                 const whisper_token = data.result[0].listing.hideout_token;
-                                alert('前往藏身处: ' + whisper_token);
+                                //alert('前往藏身处: ' + whisper_token);
+                                //post to hideout
+                                fetch(hideoutActionUrl, {
+                                    method: 'POST',
+                                    mode: "cors",
+                                    credentials: "include",
+                                    headers: {
+                                        accept: "*/*",
+                                        "accept-language": "zh-CN,zh;q=0.9",
+                                        "cache-control": "no-cache",
+                                        "content-type": "application/json",
+                                        pragma: "no-cache",
+                                        priority: "u=1, i",
+                                        "sec-fetch-dest": "empty",
+                                        "sec-fetch-mode": "cors",
+                                        "sec-fetch-site": "same-origin",
+                                        "x-requested-with": "XMLHttpRequest"
+                                    },
+                                    body: JSON.stringify({
+                                        token: whisper_token
+                                    })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        //status
+                                        if (data.status === 200) {
+                                            alert('正在前往藏身处...');
+                                        } else {
+                                            alert('前往藏身处失败: ' + data.error.message);
+                                        }
+                                    })
+
+
+
                             }
                         })
                         .catch(error => {
