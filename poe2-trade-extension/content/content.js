@@ -53,8 +53,8 @@ function toggleStar(btn, row) {
     const isActive = btn.classList.contains('active');
     const itemId = row.getAttribute('data-id');
     if (isActive) {
-        btn.classList.remove('active');
-        btn.innerHTML = '☆';
+        // btn.classList.remove('active');
+        // btn.innerHTML = '☆';
         // TODO: Remove from collection (requires tracking ID)
         sidebar.removeFromCollection(itemId);
 

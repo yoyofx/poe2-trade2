@@ -70,6 +70,15 @@ class TreeView {
     }
 
     deleteNode(id) {
+        const row = document.querySelector(`.row[data-id="${id}"]`);
+        if (row) {
+            const starBtn = row.querySelector('.poe2-trade-star-btn');
+            if (starBtn) {
+                starBtn.classList.remove('active');
+                starBtn.innerHTML = '☆';
+            }
+        }
+
         this.data = this.filterNode(id, this.data);
         if (this.selectedNodeId === id) this.selectedNodeId = null;
         this.save();
@@ -146,7 +155,7 @@ class TreeView {
         label.textContent = node.name;
         // Item Details (Price & Affixes)
         if (node.type === 'item' && node.data) {
-            if(node.data.nameCss) {
+            if (node.data.nameCss) {
                 label.style.cssText = node.data.nameCss;
             }
 
