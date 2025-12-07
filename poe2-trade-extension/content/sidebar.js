@@ -49,7 +49,7 @@ class TreeView {
     addItem(item) {
         const targetId = this.selectedNodeId;
         const newItem = {
-            id: Date.now().toString(),
+            id: item.id,
             type: 'item',
             name: item.name || 'Unknown Item',
             data: item
@@ -146,6 +146,10 @@ class TreeView {
         label.textContent = node.name;
         // Item Details (Price & Affixes)
         if (node.type === 'item' && node.data) {
+            if(node.data.nameCss) {
+                label.style.cssText = node.data.nameCss;
+            }
+
             const details = document.createElement('div');
             details.className = 'item-details';
 
@@ -400,6 +404,10 @@ class Sidebar {
             this.toggle();
         }
         this.switchTab('collections');
+    }
+
+    removeFromCollection(itemId) {
+        this.collectionsTree.deleteNode(itemId);
     }
 }
 

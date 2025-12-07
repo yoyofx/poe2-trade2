@@ -51,27 +51,29 @@ function injectStarButton(row) {
 
 function toggleStar(btn, row) {
     const isActive = btn.classList.contains('active');
+    const itemId = row.getAttribute('data-id');
     if (isActive) {
         btn.classList.remove('active');
         btn.innerHTML = '☆';
         // TODO: Remove from collection (requires tracking ID)
+        sidebar.removeFromCollection(itemId);
+
     } else {
         btn.classList.add('active');
         btn.innerHTML = '★';
 
         // Extract Data
-        const itemData = extractItemData(row);
+        const itemData = extractItemData(row, itemId);
         sidebar.addToCollection(itemData);
     }
 }
 
-function extractItemData(row) {
+function extractItemData(row, itemId) {
 
     // Attempt to extract relevant data
     // This is highly dependent on the actual DOM structure of PoE Trade site
     // get row attribate , data-id
-    const itemid = row.getAttribute('data-id');
-    console.log(itemid)
+    console.log(itemId)
 
     const nameEl = row.querySelector('.itemName') || row.querySelector('.name');
     const typeEl = row.querySelector('.itemType') || row.querySelector('.typeLine');
@@ -87,7 +89,7 @@ function extractItemData(row) {
     const affixes = Array.from(row.querySelectorAll('.explicitMod')).map(el => parseAffix(el.innerText));
 
     return {
-        id: itemid,
+        id: itemId,
         name: (nameEl ? nameEl.innerText : '') + ' ' + (typeEl ? typeEl.innerText : '') || 'Unknown Item',
         nameCss: nameEl ? `color: ${window.getComputedStyle(nameEl).color}` : '',
         price: priceEl ? priceEl.innerText : 'Unknown Price',
