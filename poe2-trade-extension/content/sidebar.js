@@ -213,8 +213,19 @@ class TreeView {
             const actionsFooter = document.createElement('div');
             actionsFooter.className = 'item-actions-footer';
 
-            // Hideout Button
-            if (node.data.id) {
+            // Primary Action Button (Jump to Search OR Go to Hideout)
+            if (node.data.url) {
+                // It is a Saved Search
+                const jumpBtn = document.createElement('button');
+                jumpBtn.className = 'footer-action-btn btn-jump';
+                jumpBtn.innerHTML = '🔗 跳转到存储的搜索中';
+                jumpBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    window.location.href = node.data.url;
+                };
+                actionsFooter.appendChild(jumpBtn);
+            } else if (node.data.id) {
+                // It is a Trade Item -> Hideout
                 const whisperBtn = document.createElement('button');
                 whisperBtn.className = 'footer-action-btn btn-hideout';
                 whisperBtn.innerHTML = '🏠 前往藏身处';
