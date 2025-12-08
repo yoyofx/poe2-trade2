@@ -162,26 +162,23 @@ class TreeView {
             };
         }
 
-        const label = document.createElement('span');
-        label.className = 'tree-label';
-
-        if (node.type === 'folder') {
-            label.textContent = node.name;
-        } else {
-            label.textContent = node.name;
-        }
-
         // ============================================
         // ITEM RENDERING LOGIC
         // ============================================
         if (node.type === 'item' && node.data) {
-            label.classList.add('item-name');
+            // Create item name element
+            const itemName = document.createElement('div');
+            itemName.className = 'tree-label item-name';
+            itemName.textContent = node.name;
             if (node.data.nameCss) {
-                label.style.cssText = node.data.nameCss;
+                itemName.style.cssText = node.data.nameCss;
             }
 
             const details = document.createElement('div');
             details.className = 'item-details';
+
+            // Add name as first element in details
+            details.appendChild(itemName);
 
             // Price
             if (node.data.price) {
@@ -191,141 +188,203 @@ class TreeView {
                 details.appendChild(price);
             }
 
-            // Affixes
-            if (node.data.affixes && node.data.affixes.length > 0) {
-                const affixesList = document.createElement('div');
-                affixesList.className = 'item-affixes';
-                node.data.affixes.forEach(affix => {
-                    const affixEl = document.createElement('div');
-                    affixEl.className = 'item-affix';
+            // Skills
+            if (node.data.skills && node.data.skills.length > 0) {
+                const skillsList = document.createElement('div');
+                skillsList.className = 'item-section item-skills';
+                node.data.skills.forEach(skill => {
+                    const skillEl = document.createElement('div');
+                    skillEl.className = 'item-skill-row';
 
-                    // Tier Highlighting Logic
-                    if (affix.tier === 1) affixEl.classList.add('item-affix-t1');
-                    if (affix.tier === 2) affixEl.classList.add('item-affix-t2');
-
-                    let text = affix.content;
-
-                    // Prefix/Suffix Label
-                    // Only show if 'isPrefix' is explicitly defined boolean
-                    let typeTag = '';
-                    if (typeof affix.isPrefix === 'boolean') {
-                        const isPrefix = affix.isPrefix;
-                        const typeText = isPrefix ? '前缀' : '后缀';
-                        const typeClass = isPrefix ? 'type-prefix' : 'type-suffix';
-                        typeTag = `<span class="affix-type ${typeClass}">${typeText}</span>`;
+                    let iconHtml = '';
+                    if (skill.imageUrl) {
+                        iconHtml = `<img src="${skill.imageUrl}" class="skill-icon" />`;
                     }
 
-                    let tierTag = '';
-                    if (affix.tier > 0) {
-                        tierTag = `<span class="affix-tier">T${affix.tier}</span>`;
-                    }
-                    affixEl.innerHTML = `${typeTag} ${tierTag} <span class="affix-text">${text}</span>`;
-                    affixesList.appendChild(affixEl);
+                    skillEl.innerHTML = `${iconHtml}<span class="skill-text">${skill.level ? `Lv: ${skill.level} ` : ''}${skill.name}</span>`;
+                    skillsList.appendChild(skillEl);
                 });
-                details.appendChild(affixesList);
+                details.appendChild(skillsList);
             }
 
-            // Footer Buttons
-            const actionsFooter = document.createElement('div');
-            actionsFooter.className = 'item-actions-footer';
+            // Helper function to render affixes
+            const renderAffixSection = (affixArray, sectionClass, sectionLabel) => {
+                if (affixArray && affixArray.length > 0) {
+                    const section = document.createElement('div');
+                    section.className = `item-section ${sectionClass}`;
 
-            // Primary Action Button (Jump to Search OR Go to Hideout)
-            if (node.data.url) {
-                // It is a Saved Search
-                const jumpBtn = document.createElement('button');
-                jumpBtn.className = 'footer-action-btn btn-jump';
-                jumpBtn.innerHTML = '🔗';
-                jumpBtn.title = '跳转到搜索'; // Tooltip
-                jumpBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    window.location.href = node.data.url;
-                };
-                actionsFooter.appendChild(jumpBtn);
-            } else if (node.data.id) {
-                // It is a Trade Item -> Hideout
-                const whisperBtn = document.createElement('button');
-                whisperBtn.className = 'footer-action-btn btn-hideout';
-                whisperBtn.innerHTML = '🏠';
-                whisperBtn.title = '前往藏身处'; // Tooltip
-                whisperBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
-                    const url = `https://poe.game.qq.com/api/trade2/fetch/${node.data.id}?query=GvjbmPOUb&realm=poe2`;
+                    if (sectionLabel) {
+                        const label = document.createElement('div');
+                        label.className = 'section-label';
+                        label.textContent = sectionLabel;
+                        section.appendChild(label);
+                    }
 
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.result.length > 0) {
-                                const whisper_token = data.result[0].listing.hideout_token;
-                                fetch(hideoutActionUrl, {
-                                    method: 'POST',
-                                    headers: {
-                                        "content-type": "application/json",
-                                        "x-requested-with": "XMLHttpRequest"
-                                    },
-                                    body: JSON.stringify({ token: whisper_token })
-                                })
-                                    .then(r => r.json())
-                                    .then(d => {
-                                        if (d.status === 200 || !d.error) {
-                                            alert('正在前往藏身处...');
-                                        } else {
-                                            alert('前往失败: ' + (d.error ? d.error.message : 'Unknown error'));
-                                        }
-                                    });
-                            }
-                        })
-                        .catch(err => console.error(err));
-                };
-                actionsFooter.appendChild(whisperBtn);
-            }
+                    affixArray.forEach(affix => {
+                        const affixEl = document.createElement('div');
+                        affixEl.className = 'item-affix';
 
-            // Delete Button
+                        // Add tier class for highlighting
+                        if (affix.tier === 1) {
+                            affixEl.classList.add('item-affix-t1');
+                        } else if (affix.tier === 2) {
+                            affixEl.classList.add('item-affix-t2');
+                        }
+
+                        // Add type class
+                        if (affix.isPrefix !== null) {
+                            affixEl.classList.add(affix.isPrefix ? 'type-prefix' : 'type-suffix');
+                        }
+
+                        // Type tag (前缀/后缀)
+                        if (affix.isPrefix !== null) {
+                            const typeTag = document.createElement('span');
+                            typeTag.className = 'affix-type-tag';
+                            typeTag.textContent = affix.isPrefix ? '前缀' : '后缀';
+                            affixEl.appendChild(typeTag);
+                        }
+
+                        // Tier tag (T1/T2/T3...)
+                        if (affix.tier !== null) {
+                            const tierTag = document.createElement('span');
+                            tierTag.className = 'affix-tier';
+                            tierTag.textContent = `T${affix.tier}`;
+                            affixEl.appendChild(tierTag);
+                        }
+
+                        // Range tag (only if min !== max)
+                        if (affix.tierRange && affix.tierRange.min !== affix.tierRange.max) {
+                            const rangeTag = document.createElement('span');
+                            rangeTag.className = 'affix-range';
+                            rangeTag.textContent = `[${affix.tierRange.min}-${affix.tierRange.max}]`;
+                            affixEl.appendChild(rangeTag);
+                        }
+
+                        // Content text
+                        const text = document.createElement('span');
+                        text.className = 'affix-text';
+                        text.textContent = affix.content;
+                        affixEl.appendChild(text);
+
+                        section.appendChild(affixEl);
+                    });
+
+                    details.appendChild(section);
+                }
+            };
+
+
+            // Render base/implicits (first)
+            renderAffixSection(node.data.base, 'item-base', '基底:');
+
+            // Render runes (second)
+            renderAffixSection(node.data.runes, 'item-runes', '符文:');
+
+            // Render affixes (third)
+            renderAffixSection(node.data.affixes, 'item-affixes', null);
+
+            // Render desecrates (last)
+            renderAffixSection(node.data.desecrates, 'item-desecrates', null);
+
+            // Action buttons
+            const actions = document.createElement('div');
+            actions.className = 'item-actions-footer';
+
+            // Copy Hideout button
+            const hideoutBtn = document.createElement('button');
+            hideoutBtn.className = 'footer-action-btn btn-hideout';
+            hideoutBtn.innerHTML = '🏠';
+            hideoutBtn.title = '复制藏身处命令';
+            hideoutBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (node.data.playerName) {
+                    const cmd = `/hideout ${node.data.playerName}`;
+                    navigator.clipboard.writeText(cmd);
+                }
+            };
+            actions.appendChild(hideoutBtn);
+
+            // Delete button
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'footer-action-btn btn-delete';
             deleteBtn.innerHTML = '🗑';
-            deleteBtn.title = '删除'; // Tooltip
+            deleteBtn.title = '删除';
             deleteBtn.onclick = (e) => {
                 e.stopPropagation();
-                if (confirm('删除此项目?')) {
+                if (confirm('确定要删除这个物品吗?')) {
                     this.deleteNode(node.id);
                 }
             };
-            actionsFooter.appendChild(deleteBtn);
+            actions.appendChild(deleteBtn);
 
-            details.appendChild(actionsFooter);
-            label.appendChild(details);
+            // Copy Whisper button
+            const whisperBtn = document.createElement('button');
+            whisperBtn.className = 'footer-action-btn btn-whisper';
+            whisperBtn.innerHTML = '💬';
+            whisperBtn.title = '复制密语';
+            whisperBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (node.data.whisperBtn) {
+                    node.data.whisperBtn.click();
+                }
+            };
+            actions.appendChild(whisperBtn);
+
+            // Jump to item button
+            const jumpBtn = document.createElement('button');
+            jumpBtn.className = 'footer-action-btn btn-jump';
+            jumpBtn.innerHTML = '🔍';
+            jumpBtn.title = '跳转到物品';
+            jumpBtn.onclick = (e) => {
+                e.stopPropagation();
+                const targetRow = document.querySelector(`.row[data-id="${node.id}"]`);
+                if (targetRow) {
+                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetRow.style.outline = '2px solid var(--accent-gold)';
+                    setTimeout(() => {
+                        targetRow.style.outline = '';
+                    }, 2000);
+                }
+            };
+            actions.appendChild(jumpBtn);
+
+
+
+            details.appendChild(actions);
+            el.appendChild(details);
         }
 
-        // ============================================
-        // HEADER ASSEMBLY
-        // ============================================
-        if (toggle) {
-            header.appendChild(toggle);
-        }
-        header.appendChild(label);
+        // Folder delete action
+        if (node.type === 'folder') {
+            // Create folder label
+            const label = document.createElement('span');
+            label.className = 'tree-label';
+            label.textContent = node.name;
 
-        // Folder Actions (Hover actions only for folders)
-        if (node.type !== 'item') {
             const actions = document.createElement('div');
             actions.className = 'tree-actions';
 
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'tree-action-btn';
             deleteBtn.innerHTML = '🗑';
+            deleteBtn.title = '删除文件夹';
             deleteBtn.onclick = (e) => {
                 e.stopPropagation();
-                if (confirm('删除此文件夹?')) {
+                if (confirm('确定要删除这个文件夹及其所有内容吗?')) {
                     this.deleteNode(node.id);
                 }
             };
             actions.appendChild(deleteBtn);
+
+            if (toggle) header.appendChild(toggle);
+            header.appendChild(label);
             header.appendChild(actions);
         }
 
         el.appendChild(header);
 
-        if (node.type === 'folder' && node.expanded && node.children) {
+        // Children (only for folders)
+        if (node.type === 'folder' && node.expanded && node.children && node.children.length > 0) {
             const childrenContainer = document.createElement('div');
             childrenContainer.className = 'tree-children';
             node.children.forEach(child => {
@@ -338,6 +397,9 @@ class TreeView {
     }
 }
 
+// ============================================
+// SIDEBAR CLASS
+// ============================================
 class Sidebar {
     constructor() {
         this.isVisible = false;

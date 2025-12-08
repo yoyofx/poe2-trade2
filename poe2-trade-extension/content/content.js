@@ -86,44 +86,112 @@ function extractItemData(row, itemId) {
     // Fallback: Use full text if specific elements aren't found
     const fullText = row.innerText.split('\n').filter(line => line.trim() !== '').join(' | ');
 
-    const affixes = Array.from(row.querySelectorAll('.explicitMod')).map(el => parseAffix(el.innerText));
+    const affixes = Array.from(row.querySelectorAll('.explicitMod')).map(el => parseAffix(el));
+    const implicits = Array.from(row.querySelectorAll('.implicitMod')).map(el => parseAffix(el));
+    const runes = Array.from(row.querySelectorAll('.runeMod')).map(el => parseAffix(el));
+    const desecrates = Array.from(row.querySelectorAll('.desecratedMod')).map(el => parseAffix(el));
+    const skills = Array.from(row.querySelectorAll('.skills .skill')).map(el => parseSkill(el));
 
-    return {
+    let name = (nameEl ? nameEl.innerText : '');
+    let typeName = (typeEl ? typeEl.innerText : '');
+
+    let a = {
         id: itemId,
-        name: (nameEl ? nameEl.innerText : '') + ' ' + (typeEl ? typeEl.innerText : '') || 'Unknown Item',
+        name: (name === typeName) ? name : name + ' ' + typeName,
         nameCss: nameEl ? `color: ${window.getComputedStyle(nameEl).color}` : '',
         price: priceEl ? priceEl.innerText : 'Unknown Price',
         playerName: playerEl ? playerEl.innerText : null,
         whisperBtn: whisperBtn,
         fullText: fullText,
         affixes: affixes,
+        base: implicits,
+        runes: runes,
+        desecrates: desecrates,
+        skills: skills,
         timestamp: Date.now()
+    };
+    console.log(a);
+    return a;
+}
+
+function parseSkill(div) {
+    const lcs = div.querySelector('.lc.s');
+    const img = div.querySelector('img');
+    const type = lcs ? lcs.dataset.field : null;
+    const imageUrl = img ? img.src : null;
+
+    let level = null;
+    let name = '';
+
+    if (lcs) {
+        const spans = lcs.querySelectorAll('span');
+        const textSpan = spans.length > 0 ? spans[spans.length - 1] : null;
+
+        if (textSpan) {
+            const text = textSpan.innerText;
+            const levelMatch = text.match(/等级\s*(\d+)/);
+            if (levelMatch) {
+                level = parseInt(levelMatch[1], 10);
+                name = text.replace(levelMatch[0], '').trim();
+            } else {
+                name = text;
+            }
+        }
+    }
+
+    return {
+        type,
+        imageUrl,
+        level,
+        name
     };
 }
 
-function parseAffix(text) {
-    const parts = text.split('\n');
-    const tagLine = parts[0];
-    const content = parts.slice(1).join('\n');
+function parseAffix(div) {
+    const lcl = div.querySelector('.lc.l');
+    const lcs = div.querySelector('.lc.s');
 
-    const tags = tagLine.split('+').map(t => t.trim());
-    const affixChildren = tags.map(tag => {
-        const match = tag.match(/([SP])(\d+)/);
-        if (match) {
-            return {
-                isPrefix: match[1] === 'S',
-                tier: parseInt(match[2], 10)
-            };
+    const content = lcs ? lcs.innerText : '';
+    const type = lcs ? lcs.dataset.field : null;
+
+    const tagText = lcl ? lcl.innerHTML : '';
+    const parts = tagText.split('+').map(t => t.trim());
+
+    const affixChildren = parts.map(tag => {
+        const tierMatch = tag.match(/([PS])(\d+)/i);
+        const rangeMatch = tag.match(/\[(\d+)\s*[—\-]\s*(\d+)\]/);
+
+        if (!tierMatch && !rangeMatch) return null;
+
+        const child = {};
+
+        if (tierMatch) {
+            child.isPrefix = tierMatch[1].toUpperCase() === 'P';
+            child.tier = parseInt(tierMatch[2], 10);
+        } else {
+            child.isPrefix = null;
+            child.tier = null;
         }
-        return null;
+
+        if (rangeMatch) {
+            child.tierRange = {
+                min: parseInt(rangeMatch[1], 10),
+                max: parseInt(rangeMatch[2], 10)
+            };
+        } else {
+            child.tierRange = null;
+        }
+
+        return child;
     }).filter(Boolean);
 
-    const firstChild = affixChildren[0] || { isPrefix: false, tier: 0 };
-
+    const firstChild = affixChildren[0] || { isPrefix: null, tier: null, tierRange: null };
     return {
         isPrefix: firstChild.isPrefix,
         tier: firstChild.tier,
+        tierRange: firstChild.tierRange,
+        type: type,
         content: content,
-        affixChildren: affixChildren
+        affixChildren: affixChildren.length > 1 ? affixChildren : null
     };
 }

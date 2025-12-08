@@ -325,21 +325,6 @@
     justify-content: flex-start;
     /* Left Align */
     text-align: left;
-    /* Left Align */
-}
-
-/* Tier Highlighting and Prefix/Suffix */
-.affix-tier,
-.affix-type {
-    font-size: 11px;
-    margin-right: 6px;
-    padding: 1px 4px;
-    border-radius: 2px;
-    background: #222;
-    border: 1px solid #444;
-    color: #666;
-    display: inline-block;
-    min-width: 24px;
     text-align: center;
 }
 
@@ -358,26 +343,68 @@
     background: rgba(61, 107, 86, 0.2);
 }
 
+/* Affix Tags Styling */
+.affix-type-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    margin-right: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #aaa;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.affix-tier {
+    display: inline-block;
+    padding: 2px 6px;
+    margin-right: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #888;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.affix-range {
+    display: inline-block;
+    margin-right: 6px;
+    font-size: 11px;
+    color: #999;
+}
+
 /* Highlight Colors for T1/T2 */
-.item-affix-t1 .affix-text {
-    color: var(--accent-gold-bright);
-    text-shadow: 0 0 3px rgba(212, 180, 131, 0.3);
+.item-affix-t1 .affix-type-tag {
+    background: rgba(212, 180, 131, 0.2);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
 }
 
 .item-affix-t1 .affix-tier {
-    color: var(--accent-gold);
-    border-color: var(--accent-gold);
-    background: rgba(212, 180, 131, 0.1);
+    background: var(--accent-gold);
+    border-color: var(--accent-gold-bright);
+    color: #000;
+    font-weight: bold;
+    box-shadow: 0 0 5px rgba(212, 180, 131, 0.3);
+}
+
+.item-affix-t1 .affix-text {
+    color: var(--accent-gold-bright);
+    text-shadow: 0 0 3px rgba(212, 180, 131, 0.3);
+    font-weight: bold;
+}
+
+.item-affix-t2 .affix-tier {
+    background: rgba(224, 224, 224, 0.15);
+    border-color: #999;
+    color: #ddd;
 }
 
 .item-affix-t2 .affix-text {
     color: #e0e0e0;
     text-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
-}
-
-.item-affix-t2 .affix-tier {
-    color: #ccc;
-    border-color: #888;
 }
 
 /* Item Footer Actions */
@@ -568,4 +595,284 @@
 /* Utility */
 .hidden {
     display: none !important;
+}
+
+/* =========================================
+   New Item Detail Sections 
+   ========================================= */
+
+.item-section {
+    margin-bottom: 2px;
+}
+
+.item-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    margin: 6px 0;
+}
+
+/* Skills Section */
+.item-skills {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+    /* Slightly more space after skills */
+}
+
+.item-skill-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.skill-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8));
+}
+
+.skill-text {
+    font-size: 14px;
+    color: var(--accent-gold-bright) !important;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+}
+
+/* Base / Implicits */
+.item-base {
+    padding-left: 2px;
+}
+
+.item-base .item-affix {
+    color: #999;
+    font-style: italic;
+    /* Differentiate implicits */
+}
+
+.item-base .item-affix .affix-text {
+    color: #bbb;
+}
+
+/* Runes */
+.item-runes .item-affix {
+    border-left: 2px solid #5a8;
+    /* Greenish accent for runes? Or just distinction */
+    padding-left: 6px;
+    background: rgba(85, 170, 136, 0.05);
+}
+
+
+.item-runes .item-affix .affix-text {
+    color: #aaddcc;
+}
+
+.tree-header:hover .tree-actions {
+    display: flex;
+}
+
+.tree-action-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tree-action-btn:hover {
+    color: #fff;
+}
+
+/* Main Buttons (Add Folder etc) */
+.btn-primary {
+    background: linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%);
+    color: var(--accent-gold);
+    border: 1px solid var(--border-metallic);
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 10px;
+    font-family: var(--font-stack);
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.btn-primary:hover {
+    color: var(--accent-gold-bright);
+    border-color: var(--accent-gold-dim);
+}
+
+/* Star Button in Trade Results */
+.poe2-trade-star-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    /* Increased size */
+    height: 32px;
+    /* Increased size */
+    margin-right: 8px;
+    cursor: pointer;
+    color: #888;
+    /* Brighter default color */
+    background: linear-gradient(135deg, #222, #111);
+    /* Subtle gradient */
+    border: 1px solid #666;
+    /* More visible border */
+    border-radius: 4px;
+    font-size: 20px;
+    /* Larger icon */
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    /* Drop shadow */
+    position: relative;
+    transform-origin: center;
+}
+
+.poe2-trade-star-btn:hover {
+    color: var(--accent-gold);
+    border-color: var(--accent-gold-bright);
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 0 10px rgba(212, 180, 131, 0.4);
+    z-index: 2147483647;
+    /* MAX Z-INDEX */
+}
+
+.poe2-trade-star-btn.active {
+    color: var(--accent-gold);
+    background: linear-gradient(135deg, #332a1b 0%, #1a1a1a 100%);
+    border-color: var(--accent-gold);
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+/* Tooltip Styles */
+.poe2-trade-star-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #0f0f0f;
+    border: 1px solid var(--accent-gold-dim);
+    border-left: 3px solid var(--accent-gold);
+    /* Add a clearer left stripe */
+    color: var(--accent-gold);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    /* Slightly larger text */
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 2147483647;
+    /* MAX Z-INDEX */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+    /* Stronger shadow */
+    font-family: var(--font-stack);
+    visibility: hidden;
+    font-weight: bold;
+    /* Bold text */
+}
+
+.poe2-trade-star-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Utility */
+.hidden {
+    display: none !important;
+}
+
+/* =========================================
+   New Item Detail Sections 
+   ========================================= */
+
+.item-section {
+    margin-bottom: 2px;
+}
+
+.item-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    margin: 6px 0;
+}
+
+/* Skills Section */
+.item-skills {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+    /* Slightly more space after skills */
+}
+
+.item-skill-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.skill-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8));
+}
+
+.skill-text {
+    font-size: 14px;
+    color: var(--accent-gold-bright) !important;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+}
+
+/* Base / Implicits */
+.item-base {
+    padding-left: 2px;
+}
+
+.item-base .item-affix {
+    color: #999;
+    font-style: italic;
+    /* Differentiate implicits */
+}
+
+.item-base .item-affix .affix-text {
+    color: #bbb;
+}
+
+/* Runes */
+.item-runes .item-affix {
+    border-left: 2px solid #00F0BF;
+    /* Greenish accent for runes? Or just distinction */
+    padding-left: 6px;
+    background: rgba(85, 170, 136, 0.05);
+}
+
+.item-runes .item-affix .affix-text {
+    color: #aaddcc;
+}
+
+/* Desecrates (Corrupted mods usually) */
+.item-desecrates .item-affix {
+    border-left: 2px solid #39FF14;
+    padding-left: 6px;
+    background: rgba(85, 170, 136, 0.05);
+}
+
+.item-desecrates .item-affix .affix-text {
+    color: #00FF00;
 }
