@@ -31,7 +31,8 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 360px;
+    width: 414px;
+    /* INCREASED WIDTH 360 -> 414 */
     height: 100vh;
     background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     border-left: 2px solid var(--accent-gold-dim);
@@ -57,7 +58,8 @@
 }
 
 #poe2-trade-sidebar.collapsed {
-    transform: translateX(365px);
+    transform: translateX(420px);
+    /* ADJUSTED TRANSFORM */
 }
 
 /* Toggle Button */
@@ -380,28 +382,39 @@
 /* Item Footer Actions */
 .item-actions-footer {
     display: flex;
-    gap: 5px;
-    margin-top: 10px;
-    padding-top: 8px;
+    gap: 6px;
+    /* Spacing between small buttons */
+    margin-top: 8px;
+    padding-top: 6px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+    justify-content: flex-start;
+    /* Align actions to LEFT */
 }
 
 .footer-action-btn {
-    flex: 1;
-    background: linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%);
+    flex: none;
+    /* Fixed size */
+    width: 24px;
+    height: 24px;
+    background: #1a1a1a;
     border: 1px solid var(--border-metallic);
     color: var(--text-muted);
-    padding: 6px;
+    padding: 0;
     cursor: pointer;
-    font-size: 12px;
-    border-radius: 3px;
-    font-family: var(--font-stack);
+    font-size: 14px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .footer-action-btn:hover {
     color: var(--text-highlight);
     border-color: #666;
+    background: #2a2a2a;
+    transform: translateY(-1px);
 }
 
 .btn-hideout:hover {
@@ -419,12 +432,14 @@
 .btn-jump:hover {
     color: #aef;
     border-color: #6da;
-    background: linear-gradient(180deg, #2c3c3c 0%, #1a2a2a 100%);
+    background: #1a2a2a;
+    box-shadow: 0 0 5px rgba(102, 221, 170, 0.2);
 }
 
 .btn-delete:hover {
     color: #ff6666;
     border-color: #993333;
+    background: #2a1a1a;
 }
 
 /* Folder Actions (Top Right) */

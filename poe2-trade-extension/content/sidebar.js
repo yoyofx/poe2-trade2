@@ -218,7 +218,8 @@ class TreeView {
                 // It is a Saved Search
                 const jumpBtn = document.createElement('button');
                 jumpBtn.className = 'footer-action-btn btn-jump';
-                jumpBtn.innerHTML = '🔗 跳转到存储的搜索中';
+                jumpBtn.innerHTML = '🔗';
+                jumpBtn.title = '跳转到搜索'; // Tooltip
                 jumpBtn.onclick = (e) => {
                     e.stopPropagation();
                     window.location.href = node.data.url;
@@ -228,7 +229,8 @@ class TreeView {
                 // It is a Trade Item -> Hideout
                 const whisperBtn = document.createElement('button');
                 whisperBtn.className = 'footer-action-btn btn-hideout';
-                whisperBtn.innerHTML = '🏠 前往藏身处';
+                whisperBtn.innerHTML = '🏠';
+                whisperBtn.title = '前往藏身处'; // Tooltip
                 whisperBtn.onclick = (e) => {
                     e.stopPropagation();
                     const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
@@ -265,7 +267,8 @@ class TreeView {
             // Delete Button
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'footer-action-btn btn-delete';
-            deleteBtn.innerHTML = '🗑 删除';
+            deleteBtn.innerHTML = '🗑';
+            deleteBtn.title = '删除'; // Tooltip
             deleteBtn.onclick = (e) => {
                 e.stopPropagation();
                 if (confirm('删除此项目?')) {
@@ -350,7 +353,7 @@ class Sidebar {
       </div>
       <div class="sidebar-tabs">
         <div class="sidebar-tab active" data-tab="collections">物品收藏</div>
-        <div class="sidebar-tab" data-tab="searches">搜索存储</div>
+        <div class="sidebar-tab" data-tab="searches">搜索收藏</div>
       </div>
       <div class="sidebar-content">
         <div id="tab-collections" class="tab-pane active">
