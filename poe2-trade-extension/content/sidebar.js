@@ -343,12 +343,16 @@ class Sidebar {
       </div>
       <div class="sidebar-content">
         <div id="tab-collections" class="tab-pane active">
-          <button id="btn-add-folder-collection" class="btn-primary">+ 新建文件夹</button>
+          <div class="tab-actions-sticky">
+             <button id="btn-add-folder-collection" class="btn-primary">+ 新建文件夹</button>
+          </div>
           <div id="collections-tree" class="tree-root"></div>
         </div>
         <div id="tab-searches" class="tab-pane">
-          <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
-          <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
+          <div class="tab-actions-sticky">
+             <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
+             <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
+          </div>
           <div id="searches-tree" class="tree-root"></div>
         </div>
       </div>
