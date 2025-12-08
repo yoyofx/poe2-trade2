@@ -266,6 +266,7 @@
 }
 
 .tree-label {
+    margin-left: 4px;
     flex: 1;
     overflow: hidden;
     white-space: normal;

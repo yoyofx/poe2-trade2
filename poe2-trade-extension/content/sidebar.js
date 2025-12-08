@@ -102,7 +102,11 @@ class TreeView {
     }
 
     selectNode(id) {
-        this.selectedNodeId = id;
+        if (this.selectedNodeId === id) {
+            this.selectedNodeId = null; // Toggle off
+        } else {
+            this.selectedNodeId = id;
+        }
         this.render();
     }
 
@@ -132,6 +136,18 @@ class TreeView {
                 }
             }
         };
+
+        // Double click to rename folder
+        if (node.type === 'folder') {
+            header.ondblclick = (e) => {
+                e.stopPropagation();
+                const newName = prompt('重命名文件夹:', node.name);
+                if (newName && newName.trim() !== '') {
+                    node.name = newName;
+                    this.save();
+                }
+            };
+        }
 
         // Toggle only for folders
         let toggle = null;
