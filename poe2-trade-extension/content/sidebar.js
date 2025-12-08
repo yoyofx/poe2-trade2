@@ -366,9 +366,11 @@ class Sidebar {
         });
 
         document.getElementById('btn-save-search').addEventListener('click', () => {
-            const name = prompt('搜索名称(可选):') || '已保存的搜索';
-            const url = window.location.href;
-            this.searchesTree.addItem({ name: name, url: url });
+            const name = prompt('搜索名称(可选):');
+            if (name !== null) {
+                const url = window.location.href;
+                this.searchesTree.addItem({ id: Date.now().toString(), name: name || '已保存的搜索', url: url });
+            }
         });
     }
 

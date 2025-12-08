@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # Project: PoE 2 Trade Helper (流放2网购助手)
 
 ## Overview
@@ -23,7 +27,6 @@ A Chrome extension designed to enhance the Path of Exile 2 trade site experience
 
 ### Root Directory
 -   `README.md`: Project goals and feature list.
--   `ai_context.md`: Additional context for AI assistants.
 
 ### Extension Directory (`poe2-trade-extension/`)
 -   `manifest.json`: Extension configuration (Manifest V3).
