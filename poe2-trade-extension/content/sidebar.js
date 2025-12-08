@@ -297,11 +297,35 @@ class TreeView {
             hideoutBtn.title = '复制藏身处命令';
             hideoutBtn.onclick = (e) => {
                 e.stopPropagation();
-                if (node.data.playerName) {
-                    const cmd = `/hideout ${node.data.playerName}`;
-                    navigator.clipboard.writeText(cmd);
-                }
+                const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
+                const url = `https://poe.game.qq.com/api/trade2/fetch/${node.data.id}?query=GvjbmPOUb&realm=poe2`;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.result.length > 0) {
+                            const whisper_token = data.result[0].listing.hideout_token;
+                            fetch(hideoutActionUrl, {
+                                method: 'POST',
+                                headers: {
+                                    "content-type": "application/json",
+                                    "x-requested-with": "XMLHttpRequest"
+                                },
+                                body: JSON.stringify({ token: whisper_token })
+                            })
+                                .then(r => r.json())
+                                .then(d => {
+                                    if (d.status === 200 || !d.error) {
+                                        alert('正在前往藏身处...');
+                                    } else {
+                                        alert('前往失败: ' + (d.error ? d.error.message : 'Unknown error'));
+                                    }
+                                });
+                        }
+                    })
+                    .catch(err => console.error(err));
             };
+
             actions.appendChild(hideoutBtn);
 
             // Delete button
@@ -317,18 +341,18 @@ class TreeView {
             };
             actions.appendChild(deleteBtn);
 
-            // Copy Whisper button
-            const whisperBtn = document.createElement('button');
-            whisperBtn.className = 'footer-action-btn btn-whisper';
-            whisperBtn.innerHTML = '💬';
-            whisperBtn.title = '复制密语';
-            whisperBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (node.data.whisperBtn) {
-                    node.data.whisperBtn.click();
-                }
-            };
-            actions.appendChild(whisperBtn);
+            // // Copy Whisper button
+            // const whisperBtn = document.createElement('button');
+            // whisperBtn.className = 'footer-action-btn btn-whisper';
+            // whisperBtn.innerHTML = '💬';
+            // whisperBtn.title = '复制密语';
+            // whisperBtn.onclick = (e) => {
+            //     e.stopPropagation();
+            //     if (node.data.whisperBtn) {
+            //         node.data.whisperBtn.click();
+            //     }
+            // };
+            // actions.appendChild(whisperBtn);
 
             // Jump to item button
             const jumpBtn = document.createElement('button');
