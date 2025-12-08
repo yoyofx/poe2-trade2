@@ -462,23 +462,35 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    /* Increased size */
+    height: 32px;
+    /* Increased size */
     margin-right: 8px;
     cursor: pointer;
-    color: #555;
-    background: #111;
-    border: 1px solid #333;
+    color: #888;
+    /* Brighter default color */
+    background: linear-gradient(135deg, #222, #111);
+    /* Subtle gradient */
+    border: 1px solid #666;
+    /* More visible border */
     border-radius: 4px;
-    font-size: 16px;
-    transition: all 0.2s ease;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.8);
+    font-size: 20px;
+    /* Larger icon */
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    /* Drop shadow */
     position: relative;
+    transform-origin: center;
 }
 
 .poe2-trade-star-btn:hover {
     color: var(--accent-gold);
-    border-color: var(--accent-gold-dim);
+    border-color: var(--accent-gold-bright);
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 0 10px rgba(212, 180, 131, 0.4);
+    z-index: 2147483647;
+    /* MAX Z-INDEX */
 }
 
 .poe2-trade-star-btn.active {
@@ -486,6 +498,42 @@
     background: linear-gradient(135deg, #332a1b 0%, #1a1a1a 100%);
     border-color: var(--accent-gold);
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+/* Tooltip Styles */
+.poe2-trade-star-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #0f0f0f;
+    border: 1px solid var(--accent-gold-dim);
+    border-left: 3px solid var(--accent-gold);
+    /* Add a clearer left stripe */
+    color: var(--accent-gold);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    /* Slightly larger text */
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 2147483647;
+    /* MAX Z-INDEX */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+    /* Stronger shadow */
+    font-family: var(--font-stack);
+    visibility: hidden;
+    font-weight: bold;
+    /* Bold text */
+}
+
+.poe2-trade-star-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* Utility */
