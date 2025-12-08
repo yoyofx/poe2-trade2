@@ -131,8 +131,6 @@ class TreeView {
             e.stopPropagation();
             this.selectNode(node.id);
             if (node.data && node.data.url) {
-                // It's a saved search, navigate to it?
-                // Or maybe just show details. For now, let's just select.
                 if (confirm('前往已保存的搜索?')) {
                     window.location.href = node.data.url;
                 }
@@ -152,9 +150,20 @@ class TreeView {
 
         const label = document.createElement('span');
         label.className = 'tree-label';
-        label.textContent = node.name;
-        // Item Details (Price & Affixes)
+
+        // Use textContent for folder name, but for Item we might render differently
+        if (node.type === 'folder') {
+            label.textContent = node.name;
+        } else {
+            // For Items, we want the name to be part of the header block but maybe styled
+            label.textContent = node.name;
+        }
+
+        // ============================================
+        // ITEM RENDERING LOGIC
+        // ============================================
         if (node.type === 'item' && node.data) {
+            label.classList.add('item-name');
             if (node.data.nameCss) {
                 label.style.cssText = node.data.nameCss;
             }
@@ -162,6 +171,7 @@ class TreeView {
             const details = document.createElement('div');
             details.className = 'item-details';
 
+            // Price
             if (node.data.price) {
                 const price = document.createElement('div');
                 price.className = 'item-price';
@@ -169,107 +179,111 @@ class TreeView {
                 details.appendChild(price);
             }
 
+            // Affixes
             if (node.data.affixes && node.data.affixes.length > 0) {
                 const affixesList = document.createElement('div');
                 affixesList.className = 'item-affixes';
                 node.data.affixes.forEach(affix => {
                     const affixEl = document.createElement('div');
                     affixEl.className = 'item-affix';
-                    // affix is an object { isPrefix, tier, content, affixChildren }
-                    // We can format it nicely.
+
+                    // Tier Highlighting Logic
+                    if (affix.tier === 1) affixEl.classList.add('item-affix-t1');
+                    if (affix.tier === 2) affixEl.classList.add('item-affix-t2');
+
                     let text = affix.content;
+                    let tierTag = '';
                     if (affix.tier > 0) {
-                        text = `[T${affix.tier}] ${text}`;
+                        tierTag = `<span class="affix-tier">T${affix.tier}</span>`;
                     }
-                    affixEl.textContent = text;
+                    affixEl.innerHTML = `${tierTag} <span class="affix-text">${text}</span>`;
                     affixesList.appendChild(affixEl);
                 });
                 details.appendChild(affixesList);
             }
-            label.appendChild(details);
-        }
 
-        // Actions
-        const actions = document.createElement('div');
-        actions.className = 'tree-actions';
+            // Footer Buttons
+            const actionsFooter = document.createElement('div');
+            actionsFooter.className = 'item-actions-footer';
 
-        if (node.type === 'item' && node.data) {
+            // Hideout Button
             if (node.data.id) {
                 const whisperBtn = document.createElement('button');
-                whisperBtn.className = 'tree-action-btn';
-                whisperBtn.innerHTML = '🏠';
-                whisperBtn.title = '前往藏身处';
+                whisperBtn.className = 'footer-action-btn btn-hideout';
+                whisperBtn.innerHTML = '🏠 前往藏身处';
                 whisperBtn.onclick = (e) => {
                     e.stopPropagation();
-                    //go to the hideout of the item of url
-                    const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper'
-
+                    const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
                     const url = `https://poe.game.qq.com/api/trade2/fetch/${node.data.id}?query=GvjbmPOUb&realm=poe2`;
+
                     fetch(url)
                         .then(response => response.json())
                         .then(data => {
                             if (data.result.length > 0) {
                                 const whisper_token = data.result[0].listing.hideout_token;
-                                //alert('前往藏身处: ' + whisper_token);
-                                //post to hideout
                                 fetch(hideoutActionUrl, {
                                     method: 'POST',
-                                    mode: "cors",
-                                    credentials: "include",
                                     headers: {
-                                        accept: "*/*",
-                                        "accept-language": "zh-CN,zh;q=0.9",
-                                        "cache-control": "no-cache",
                                         "content-type": "application/json",
-                                        pragma: "no-cache",
-                                        priority: "u=1, i",
-                                        "sec-fetch-dest": "empty",
-                                        "sec-fetch-mode": "cors",
-                                        "sec-fetch-site": "same-origin",
                                         "x-requested-with": "XMLHttpRequest"
                                     },
-                                    body: JSON.stringify({
-                                        token: whisper_token
-                                    })
+                                    body: JSON.stringify({ token: whisper_token })
                                 })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        //status
-                                        if (data.status === 200) {
+                                    .then(r => r.json())
+                                    .then(d => {
+                                        if (d.status === 200 || !d.error) {
                                             alert('正在前往藏身处...');
                                         } else {
-                                            alert('前往藏身处失败: ' + data.error.message);
+                                            alert('前往失败: ' + (d.error ? d.error.message : 'Unknown error'));
                                         }
-                                    })
-
-
-
+                                    });
                             }
                         })
-                        .catch(error => {
-                            console.error('Error fetching item:', error);
-                        });
-
+                        .catch(err => console.error(err));
                 };
-                actions.appendChild(whisperBtn);
+                actionsFooter.appendChild(whisperBtn);
             }
 
+            // Delete Button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'footer-action-btn btn-delete';
+            deleteBtn.innerHTML = '🗑 删除';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('删除此项目?')) {
+                    this.deleteNode(node.id);
+                }
+            };
+            actionsFooter.appendChild(deleteBtn);
+
+            details.appendChild(actionsFooter);
+            label.appendChild(details);
         }
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'tree-action-btn';
-        deleteBtn.innerHTML = '🗑';
-        deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            if (confirm('删除此项目?')) {
-                this.deleteNode(node.id);
-            }
-        };
-        actions.appendChild(deleteBtn);
-
+        // ============================================
+        // HEADER ASSEMBLY
+        // ============================================
         header.appendChild(toggle);
         header.appendChild(label);
-        header.appendChild(actions);
+
+        // Folder Actions (Hover actions only for folders)
+        if (node.type !== 'item') {
+            const actions = document.createElement('div');
+            actions.className = 'tree-actions';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'tree-action-btn';
+            deleteBtn.innerHTML = '🗑';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('删除此文件夹?')) {
+                    this.deleteNode(node.id);
+                }
+            };
+            actions.appendChild(deleteBtn);
+            header.appendChild(actions);
+        }
+
         el.appendChild(header);
 
         if (node.type === 'folder' && node.expanded && node.children) {
@@ -306,6 +320,7 @@ class Sidebar {
     }
 
     createSidebarElement() {
+        // UI Structure
         const sidebarHTML = `
       <div id="poe2-sidebar-toggle" title="切换侧边栏">
         <span>★</span>
