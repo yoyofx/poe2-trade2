@@ -35,9 +35,6 @@ class TreeView {
             if (parent && parent.type === 'folder') {
                 parent.children.push(newFolder);
             } else {
-                // If selected is item, find its parent? Or just add to root?
-                // For simplicity, if selected is item, add to root or parent of item.
-                // Let's just add to root if target is not a folder
                 this.data.push(newFolder);
             }
         } else {
@@ -60,7 +57,6 @@ class TreeView {
             if (parent && parent.type === 'folder') {
                 parent.children.push(newItem);
             } else {
-                // If selected is not a folder, maybe add to root?
                 this.data.push(newItem);
             }
         } else {
@@ -137,10 +133,12 @@ class TreeView {
             }
         };
 
-        const toggle = document.createElement('span');
-        toggle.className = 'tree-toggle';
-        toggle.innerHTML = node.type === 'folder' ? (node.expanded ? '▼' : '▶') : '•';
+        // Toggle only for folders
+        let toggle = null;
         if (node.type === 'folder') {
+            toggle = document.createElement('span');
+            toggle.className = 'tree-toggle';
+            toggle.innerHTML = node.expanded ? '▼' : '▶';
             toggle.onclick = (e) => {
                 e.stopPropagation();
                 node.expanded = !node.expanded;
@@ -151,11 +149,9 @@ class TreeView {
         const label = document.createElement('span');
         label.className = 'tree-label';
 
-        // Use textContent for folder name, but for Item we might render differently
         if (node.type === 'folder') {
             label.textContent = node.name;
         } else {
-            // For Items, we want the name to be part of the header block but maybe styled
             label.textContent = node.name;
         }
 
@@ -192,11 +188,22 @@ class TreeView {
                     if (affix.tier === 2) affixEl.classList.add('item-affix-t2');
 
                     let text = affix.content;
+
+                    // Prefix/Suffix Label
+                    // Only show if 'isPrefix' is explicitly defined boolean
+                    let typeTag = '';
+                    if (typeof affix.isPrefix === 'boolean') {
+                        const isPrefix = affix.isPrefix;
+                        const typeText = isPrefix ? '前缀' : '后缀';
+                        const typeClass = isPrefix ? 'type-prefix' : 'type-suffix';
+                        typeTag = `<span class="affix-type ${typeClass}">${typeText}</span>`;
+                    }
+
                     let tierTag = '';
                     if (affix.tier > 0) {
                         tierTag = `<span class="affix-tier">T${affix.tier}</span>`;
                     }
-                    affixEl.innerHTML = `${tierTag} <span class="affix-text">${text}</span>`;
+                    affixEl.innerHTML = `${typeTag} ${tierTag} <span class="affix-text">${text}</span>`;
                     affixesList.appendChild(affixEl);
                 });
                 details.appendChild(affixesList);
@@ -263,7 +270,9 @@ class TreeView {
         // ============================================
         // HEADER ASSEMBLY
         // ============================================
-        header.appendChild(toggle);
+        if (toggle) {
+            header.appendChild(toggle);
+        }
         header.appendChild(label);
 
         // Folder Actions (Hover actions only for folders)
