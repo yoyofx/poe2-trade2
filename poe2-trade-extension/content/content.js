@@ -21,7 +21,7 @@ observer.observe(document.body, {
 function checkForTradeResults() {
     // Selector for trade result rows (needs to be verified against actual DOM)
     // Assuming a standard structure, but might need adjustment based on actual site
-    const results = document.querySelectorAll('.row:not(.poe2-processed)');
+    const results = document.querySelectorAll('.row:not(.poe2-processed):not(.row-total):not(.controls)');
 
     results.forEach(row => {
         row.classList.add('poe2-processed');
