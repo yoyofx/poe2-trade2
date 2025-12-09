@@ -44,6 +44,12 @@ class TreeView {
     }
 
     addItem(item) {
+        // Check for duplicates
+        if (this.findNode(item.id, this.data)) {
+            alert('该物品已在收藏中！');
+            return;
+        }
+
         const targetId = this.selectedNodeId;
         const newItem = {
             id: item.id,
@@ -266,12 +272,22 @@ class TreeView {
                             affixEl.appendChild(tierTag);
                         }
 
-                        // Range tag (only if min !== max)
-                        if (affix.tierRange && affix.tierRange.min !== affix.tierRange.max) {
+                        // Range tag (always an array now)
+                        if (affix.tierRange && affix.tierRange.length > 0) {
                             const rangeTag = document.createElement('span');
                             rangeTag.className = 'affix-range';
-                            rangeTag.textContent = `[${affix.tierRange.min}-${affix.tierRange.max}]`;
-                            affixEl.appendChild(rangeTag);
+                            const rangeTexts = affix.tierRange.map(range => {
+                                // Only show range if min !== max
+                                if (range.min === range.max) return null;
+                                const minFormatted = range.min % 1 === 0 ? range.min : range.min.toFixed(1);
+                                const maxFormatted = range.max % 1 === 0 ? range.max : range.max.toFixed(1);
+                                return `[${minFormatted}-${maxFormatted}]`;
+                            }).filter(Boolean); // remove nulls
+
+                            if (rangeTexts.length > 0) {
+                                rangeTag.textContent = rangeTexts.join(' ');
+                                affixEl.appendChild(rangeTag);
+                            }
                         }
 
                         // Content text

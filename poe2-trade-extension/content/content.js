@@ -237,9 +237,15 @@ function parseAffix(div) {
 
     const affixChildren = parts.map(tag => {
         const tierMatch = tag.match(/([PS])(\d+)/i);
-        const rangeMatch = tag.match(/\[(\d+)\s*[—\-]\s*(\d+)\]/);
 
-        if (!tierMatch && !rangeMatch) return null;
+        // 支持小数、负数和多个范围（用"到"分隔）
+        // 匹配格式：[数字—数字] 或 [数字—数字 到 数字—数字]，数字可以是负数或小数
+        // 正则更新：增加对 \u2013 (en-dash), \u2014 (em-dash) 等各种破折号的支持
+        // 去掉外层的 \[ \] 限制，以便匹配 "数字-数字" 模式多次 appearing inside the string
+        const rangePattern = /(-?\d+(?:\.\d+)?)\s*[—\-\u2013\u2014]\s*(-?\d+(?:\.\d+)?)/g;
+        const rangeMatches = [...tag.matchAll(rangePattern)];
+
+        if (!tierMatch && rangeMatches.length === 0) return null;
 
         const child = {};
 
@@ -251,19 +257,20 @@ function parseAffix(div) {
             child.tier = null;
         }
 
-        if (rangeMatch) {
-            child.tierRange = {
-                min: parseInt(rangeMatch[1], 10),
-                max: parseInt(rangeMatch[2], 10)
-            };
+        if (rangeMatches.length > 0) {
+            // 总是保存为数组
+            child.tierRange = rangeMatches.map(match => ({
+                min: parseFloat(match[1]),
+                max: parseFloat(match[2])
+            }));
         } else {
-            child.tierRange = null;
+            child.tierRange = []; // 默认为空数组
         }
 
         return child;
     }).filter(Boolean);
 
-    const firstChild = affixChildren[0] || { isPrefix: null, tier: null, tierRange: null };
+    const firstChild = affixChildren[0] || { isPrefix: null, tier: null, tierRange: [] };
 
     // 根据filter从content中提取数值
     const filter = findFilter(type);
@@ -293,25 +300,56 @@ function extractValuesFromContent(filter, content) {
         // 然后替换 #，最后转义正则特殊字符
         const cleanedFilter = filter.replace(/\s*\([^)]*\)/g, '');  // 移除括号及其内容
 
-        const escapedFilter = cleanedFilter
-            .replace(/#/g, '\x00PLACEHOLDER\x00')  // 临时替换 # 为占位符
-            .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')  // 转义正则特殊字符
-            .replace(/\x00PLACEHOLDER\x00/g, '[+\\-]?(\\d+(?:\\.\\d+)?)');  // 将占位符替换为捕获组，匹配可选的+/-号
+        // 特殊处理：如果filter包含 "+#"，而content可能是负数（即 "+" 变成了 "-" 或消失）
+        // 我们需要把 filter 中的 "+" 视为可选的或者可变的
+
+        let processedFilter = cleanedFilter;
+
+        // 预处理：将 "#" 替换为特殊占位符
+        processedFilter = processedFilter.replace(/#/g, '\x00PLACEHOLDER\x00');
+
+        // 检查是否存在 "提高"/"降低" 反转的情况
+        let isInverted = false;
+        if (cleanedFilter.includes('提高') && content.includes('降低')) {
+            processedFilter = processedFilter.replace('提高', '降低');
+            isInverted = true;
+        } else if (cleanedFilter.includes('降低') && content.includes('提高')) {
+            processedFilter = processedFilter.replace('降低', '提高');
+            isInverted = true;
+        }
+
+        // 转义正则特殊字符
+        let escapedFilter = processedFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        // 处理空格：将所有空格替换为 \s+ 以匹配 &nbsp; 等
+        escapedFilter = escapedFilter.replace(/\s+/g, '\\s+');
+
+        // 关键修复：处理 "+#" 结构。在正则转义后，"+" 变成了 "\+"
+        // 我们将 "\+\x00PLACEHOLDER\x00" (即原本的 +#) 替换为能匹配正负数的正则
+        // 这样 "+#%" 可以匹配 "+10%" 也可以匹配 "-10%"
+        escapedFilter = escapedFilter.replace(/\\\+\x00PLACEHOLDER\x00/g, '[+\\-]?(\\d+(?:\\.\\d+)?)');
+
+        // 处理剩余的占位符（即原本就没有 + 号的 #）
+        escapedFilter = escapedFilter.replace(/\x00PLACEHOLDER\x00/g, '[+\\-]?(\\d+(?:\\.\\d+)?)');
 
         const regex = new RegExp(escapedFilter);
 
         const match = content.match(regex);
 
         if (!match) {
-            console.log('No match found!');
+            // No match found
             return null;
         }
 
         // 提取所有捕获组（跳过第0个，因为它是完整匹配）
         const values = [];
         for (let i = 1; i < match.length; i++) {
-            const num = parseFloat(match[i]);
+            let num = parseFloat(match[i]);
             if (!isNaN(num)) {
+                // 如果是反转属性（提高 -> 降低），则数值取反
+                if (isInverted) {
+                    num = -num;
+                }
                 values.push(num);
             }
         }
