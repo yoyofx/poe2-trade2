@@ -69,7 +69,6 @@ function toggleStar(btn, row) {
 }
 
 function extractItemData(row, itemId) {
-
     // Attempt to extract relevant data
     // This is highly dependent on the actual DOM structure of PoE Trade site
     // get row attribate , data-id
@@ -112,6 +111,84 @@ function extractItemData(row, itemId) {
     };
     console.log(a);
     return a;
+}
+
+// 缓存trade2stats数据，避免重复读取localStorage
+let trade2StatsCache = null;
+
+function loadTrade2Stats() {
+    if (trade2StatsCache !== null) {
+        return trade2StatsCache;
+    }
+
+    try {
+        const jsonData = localStorage.getItem('lscache-trade2stats');
+        if (!jsonData) {
+            console.warn('lscache-trade2stats not found in localStorage');
+            trade2StatsCache = [];
+            return trade2StatsCache;
+        }
+
+        const dataArray = JSON.parse(jsonData);
+        if (!Array.isArray(dataArray)) {
+            console.warn('lscache-trade2stats is not an array');
+            trade2StatsCache = [];
+            return trade2StatsCache;
+        }
+
+        trade2StatsCache = dataArray;
+        return trade2StatsCache;
+    } catch (error) {
+        console.error('Error loading trade2stats:', error);
+        trade2StatsCache = [];
+        return trade2StatsCache;
+    }
+}
+
+function findFilter(id) {
+    try {
+        // 从id中提取type（以.分割后的第二个元素）
+        const parts = id.split('.');
+        if (parts.length < 2) {
+            console.warn('Invalid id format, expected at least 2 parts separated by "."');
+            return null;
+        }
+        const type = parts[1];
+
+        // 使用缓存的数据
+        const dataArray = loadTrade2Stats();
+        if (dataArray.length === 0) {
+            return null;
+        }
+
+        // 从数组中找到第一个id为type的元素
+        const typeElement = dataArray.find(item => item.id === type);
+        if (!typeElement) {
+            console.warn(`Type element with id "${type}" not found`);
+            return null;
+        }
+
+        // 获取entries字段
+        const entries = typeElement.entries;
+        if (!Array.isArray(entries)) {
+            console.warn('entries field is not an array');
+            return null;
+        }
+
+        // 从entries中找到第一个id匹配的元素（匹配id中第一个.之后的部分）
+        const idAfterFirstDot = parts.slice(1).join('.');
+        const entry = entries.find(item => item.id === idAfterFirstDot);
+        if (!entry) {
+            console.warn(`Entry with id "${id}" not found in entries`);
+            return null;
+        }
+
+        // 返回text字段
+        return entry.text || null;
+    } catch (error) {
+        console.error('Error in findFilter:', error);
+        return null;
+    }
 }
 
 function parseSkill(div) {
@@ -186,12 +263,55 @@ function parseAffix(div) {
     }).filter(Boolean);
 
     const firstChild = affixChildren[0] || { isPrefix: null, tier: null, tierRange: null };
+
+    // 根据filter从content中提取数值
+    const filter = findFilter(type);
+    const values = extractValuesFromContent(filter, content);
+
     return {
         isPrefix: firstChild.isPrefix,
         tier: firstChild.tier,
         tierRange: firstChild.tierRange,
         type: type,
+        filter: filter,
         content: content,
+        values: values,
         affixChildren: affixChildren.length > 1 ? affixChildren : null
     };
+}
+
+// 从content中根据filter提取数值
+function extractValuesFromContent(filter, content) {
+    if (!filter || !content) {
+        return null;
+    }
+
+    try {
+        // 将filter中的 # 替换为捕获数字的正则表达式
+        // 转义特殊字符，但保留 # 用于替换
+        const escapedFilter = filter
+            .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')  // 转义正则特殊字符
+            .replace(/#/g, '(\\d+(?:\\.\\d+)?)');   // # 替换为匹配正数和小数的正则
+
+        const regex = new RegExp(escapedFilter);
+        const match = content.match(regex);
+
+        if (!match) {
+            return null;
+        }
+
+        // 提取所有捕获组（跳过第0个，因为它是完整匹配）
+        const values = [];
+        for (let i = 1; i < match.length; i++) {
+            const num = parseFloat(match[i]);
+            if (!isNaN(num)) {
+                values.push(num);
+            }
+        }
+
+        return values.length > 0 ? values : null;
+    } catch (error) {
+        console.error('Error extracting values from content:', error);
+        return null;
+    }
 }
