@@ -77,14 +77,14 @@ function extractItemData(row, itemId) {
     const nameEl = row.querySelector('.itemName') || row.querySelector('.name');
     const typeEl = row.querySelector('.itemType') || row.querySelector('.typeLine');
     const priceEl = row.querySelector('.priceBlock') || row.querySelector('.price');
-    const playerEl = row.querySelector('.posted-by');
+    const playerEl = row.querySelector('.posted-by') || row.querySelector('.profile-link > a');
 
     // Try to find whisper button/data
     const whisperBtn = row.querySelector('.direct-btn');
 
     // Fallback: Use full text if specific elements aren't found
     const fullText = row.innerText.split('\n').filter(line => line.trim() !== '').join(' | ');
-
+    const category = row.querySelector('.content .property').innerText;
     const affixes = Array.from(row.querySelectorAll('.explicitMod')).map(el => parseAffix(el));
     const implicits = Array.from(row.querySelectorAll('.implicitMod')).map(el => parseAffix(el));
     const runes = Array.from(row.querySelectorAll('.runeMod')).map(el => parseAffix(el));
@@ -107,6 +107,7 @@ function extractItemData(row, itemId) {
         runes: runes,
         desecrates: desecrates,
         skills: skills,
+        category: category,
         timestamp: Date.now()
     };
     console.log(a);
@@ -288,15 +289,21 @@ function extractValuesFromContent(filter, content) {
 
     try {
         // 将filter中的 # 替换为捕获数字的正则表达式
-        // 转义特殊字符，但保留 # 用于替换
-        const escapedFilter = filter
+        // 先移除括号中的内容（如 (区域)），因为这些在content中不存在
+        // 然后替换 #，最后转义正则特殊字符
+        const cleanedFilter = filter.replace(/\s*\([^)]*\)/g, '');  // 移除括号及其内容
+
+        const escapedFilter = cleanedFilter
+            .replace(/#/g, '\x00PLACEHOLDER\x00')  // 临时替换 # 为占位符
             .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')  // 转义正则特殊字符
-            .replace(/#/g, '(\\d+(?:\\.\\d+)?)');   // # 替换为匹配正数和小数的正则
+            .replace(/\x00PLACEHOLDER\x00/g, '[+\\-]?(\\d+(?:\\.\\d+)?)');  // 将占位符替换为捕获组，匹配可选的+/-号
 
         const regex = new RegExp(escapedFilter);
+
         const match = content.match(regex);
 
         if (!match) {
+            console.log('No match found!');
             return null;
         }
 
@@ -308,7 +315,6 @@ function extractValuesFromContent(filter, content) {
                 values.push(num);
             }
         }
-
         return values.length > 0 ? values : null;
     } catch (error) {
         console.error('Error extracting values from content:', error);

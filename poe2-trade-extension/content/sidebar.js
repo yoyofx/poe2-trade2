@@ -180,6 +180,14 @@ class TreeView {
             // Add name as first element in details
             details.appendChild(itemName);
 
+            // Category
+            if (node.data.category) {
+                const category = document.createElement('div');
+                category.className = 'item-category';
+                category.textContent = node.data.category;
+                details.appendChild(category);
+            }
+
             // Price
             if (node.data.price) {
                 const price = document.createElement('div');

@@ -294,6 +294,18 @@
     width: 100%;
 }
 
+.item-category {
+    text-align: left;
+    color: #999;
+    font-size: 13px;
+    margin-bottom: 6px;
+    padding: 3px 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    border-left: 2px solid rgba(163, 141, 109, 0.3);
+    font-style: italic;
+}
+
 .item-price {
     text-align: left;
     /* Left Align */
