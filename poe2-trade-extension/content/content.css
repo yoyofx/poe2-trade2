@@ -356,6 +356,47 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.item-screenshot-tooltip img {
+    max-width: 100%;
+    display: block;
+    border-radius: 2px;
+}
+
+/* Generic Tooltip Button */
+.tooltip-btn {
+    position: relative;
+}
+
+.tooltip-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #0f0f0f;
+    border: 1px solid var(--accent-gold-dim);
+    border-left: 3px solid var(--accent-gold);
+    color: var(--accent-gold);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 2147483647;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+    font-family: var(--font-stack);
+    visibility: hidden;
+    font-weight: normal;
+}
+
+.tooltip-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
 .affix-tier {
     display: inline-block;
     padding: 2px 6px;

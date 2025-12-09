@@ -292,9 +292,9 @@ class TreeView {
 
             // Copy Hideout button
             const hideoutBtn = document.createElement('button');
-            hideoutBtn.className = 'footer-action-btn btn-hideout';
+            hideoutBtn.className = 'footer-action-btn btn-hideout tooltip-btn';
             hideoutBtn.innerHTML = '🏠';
-            hideoutBtn.title = '复制藏身处命令';
+            hideoutBtn.setAttribute('data-tooltip', '跳转到藏身处');
             hideoutBtn.onclick = (e) => {
                 e.stopPropagation();
                 const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
@@ -330,9 +330,9 @@ class TreeView {
 
             // Delete button
             const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'footer-action-btn btn-delete';
+            deleteBtn.className = 'footer-action-btn btn-delete tooltip-btn';
             deleteBtn.innerHTML = '🗑';
-            deleteBtn.title = '删除';
+            deleteBtn.setAttribute('data-tooltip', '删除');
             deleteBtn.onclick = (e) => {
                 e.stopPropagation();
                 if (confirm('确定要删除这个物品吗?')) {
@@ -341,36 +341,19 @@ class TreeView {
             };
             actions.appendChild(deleteBtn);
 
-            // // Copy Whisper button
-            // const whisperBtn = document.createElement('button');
-            // whisperBtn.className = 'footer-action-btn btn-whisper';
-            // whisperBtn.innerHTML = '💬';
-            // whisperBtn.title = '复制密语';
-            // whisperBtn.onclick = (e) => {
-            //     e.stopPropagation();
-            //     if (node.data.whisperBtn) {
-            //         node.data.whisperBtn.click();
-            //     }
-            // };
-            // actions.appendChild(whisperBtn);
-
-            // Jump to item button
-            const jumpBtn = document.createElement('button');
-            jumpBtn.className = 'footer-action-btn btn-jump';
-            jumpBtn.innerHTML = '🔍';
-            jumpBtn.title = '跳转到物品';
-            jumpBtn.onclick = (e) => {
+            // Find Similar button (Replaces Jump)
+            const findSimilarBtn = document.createElement('button');
+            findSimilarBtn.className = 'footer-action-btn btn-find-similar tooltip-btn';
+            findSimilarBtn.innerHTML = '🔍';
+            findSimilarBtn.title = ''; // Ensure no native title
+            findSimilarBtn.setAttribute('data-tooltip', '找相似');
+            findSimilarBtn.onclick = (e) => {
                 e.stopPropagation();
-                const targetRow = document.querySelector(`.row[data-id="${node.id}"]`);
-                if (targetRow) {
-                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    targetRow.style.outline = '2px solid var(--accent-gold)';
-                    setTimeout(() => {
-                        targetRow.style.outline = '';
-                    }, 2000);
-                }
+                // Basic Find Similar: Open search with item name
+                const searchUrl = `https://poe.game.qq.com/trade2/search/poe2/Standard?q=${encodeURIComponent(node.name)}`;
+                window.open(searchUrl, '_blank');
             };
-            actions.appendChild(jumpBtn);
+            actions.appendChild(findSimilarBtn);
 
 
 
