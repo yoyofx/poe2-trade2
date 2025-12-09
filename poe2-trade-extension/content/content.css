@@ -277,33 +277,43 @@
 }
 
 /* ITEM CARD STYLING */
-.item-name {
-    display: block;
-    text-align: left;
-    /* Left Align */
-    font-size: 16px;
+.item-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 5px 0;
-    font-weight: bold;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     margin-bottom: 8px;
+}
+
+.item-category {
+    flex-shrink: 0;
+    color: #999;
+    font-size: 12px;
+    padding: 3px 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    border-left: 2px solid rgba(163, 141, 109, 0.3);
+    font-style: italic;
+    white-space: nowrap;
+}
+
+.item-name {
+    flex: 1;
+    text-align: left;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .item-details {
     padding: 0;
     margin-top: 5px;
     width: 100%;
-}
-
-.item-category {
-    text-align: left;
-    color: #999;
-    font-size: 13px;
-    margin-bottom: 6px;
-    padding: 3px 6px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 3px;
-    border-left: 2px solid rgba(163, 141, 109, 0.3);
-    font-style: italic;
 }
 
 .item-price {

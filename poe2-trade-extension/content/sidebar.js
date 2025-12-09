@@ -177,16 +177,22 @@ class TreeView {
             const details = document.createElement('div');
             details.className = 'item-details';
 
-            // Add name as first element in details
-            details.appendChild(itemName);
+            // Create a wrapper for category and name to display on same line
+            const nameRow = document.createElement('div');
+            nameRow.className = 'item-name-row';
 
-            // Category
+            // Category (first - fixed length)
             if (node.data.category) {
                 const category = document.createElement('div');
                 category.className = 'item-category';
                 category.textContent = node.data.category;
-                details.appendChild(category);
+                nameRow.appendChild(category);
             }
+
+            // Add name after category
+            nameRow.appendChild(itemName);
+
+            details.appendChild(nameRow);
 
             // Price
             if (node.data.price) {
