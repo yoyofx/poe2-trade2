@@ -349,9 +349,65 @@ class TreeView {
             findSimilarBtn.setAttribute('data-tooltip', '找相似');
             findSimilarBtn.onclick = (e) => {
                 e.stopPropagation();
-                // Basic Find Similar: Open search with item name
-                const searchUrl = `https://poe.game.qq.com/trade2/search/poe2/Standard?q=${encodeURIComponent(node.name)}`;
-                window.open(searchUrl, '_blank');
+                //console.log(node.data);
+                const trade2statejson = localStorage.getItem('lscache-trade2state');
+                const trade2state = JSON.parse(trade2statejson);
+                //format url https://poe.game.qq.com/api/trade2/search/{trade2state.realm}/{trade2state.league}
+                const searchApiUrl = `https://poe.game.qq.com/api/trade2/search/${trade2state.realm}/${trade2state.league}`;
+                const searchUrl = `https://poe.game.qq.com/trade2/search/${trade2state.realm}/${trade2state.league}/`;
+
+                //foreach node.data.affixes and add filters , that item id equal by each item.type
+                console.log(node.data);
+                const filters = [];
+                node.data.affixes.forEach(affix => {
+                    var value = 0;
+                    if (affix.values !== null) {
+                        value = affix.values[0];
+                    }
+                    const type = affix.type.replace('stat.', '');
+                    filters.push({
+                        "id": type,
+                        "value": {
+                            "min": value
+                        },
+                        "disabled": false
+                    });
+                });
+
+                const json = {
+                    "query": {
+                        "status": {
+                            "option": "any"
+                        },
+                        "stats": [
+                            {
+                                "type": "and",
+                                "filters": filters,
+                                "disabled": false
+                            }
+                        ]
+                    },
+                    "sort": {
+                        "price": "asc"
+                    }
+                }
+                console.log(json);
+
+                fetch(searchApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        "content-type": "application/json",
+                        "x-requested-with": "XMLHttpRequest"
+                    },
+                    body: JSON.stringify(json)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        // 页面跳转到searchUrl + data.id, 本页刷新跳转
+                        window.location.href = searchUrl + data.id;
+                    })
+                    .catch(err => console.error(err));
             };
             actions.appendChild(findSimilarBtn);
 
