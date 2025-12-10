@@ -347,7 +347,20 @@
     justify-content: flex-start;
     /* Left Align */
     text-align: left;
-    text-align: center;
+    min-width: 0;
+    /* Prevent overflow */
+}
+
+.affix-text {
+    flex: 1;
+    white-space: normal;
+    word-break: break-word;
+    /* Handle very long words */
+    overflow-wrap: anywhere;
+    /* Ensure wrapping happens even for long strings */
+    line-height: 1.4;
+    text-align: left;
+    min-width: 0;
 }
 
 /* Specific Colors for Pre/Suf */
