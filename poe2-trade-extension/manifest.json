@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "PoE 2 Trade Helper",
     "version": "1.0",
-    "description": "A sidebar assistant for PoE 2 Trade site.",
+    "description": "流放2国服集市助手",
     "permissions": [
         "storage",
         "activeTab"
