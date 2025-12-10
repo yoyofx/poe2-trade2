@@ -34,3 +34,7 @@ PoE 2 Trade Helper 的核心功能是在每个交易结果条目里植入便捷�
 轻量化且运行高效，依托本地浏览器存储数据，安全无延迟。
 
 
+# 0.2
+1. 使用编年史使用特定物品词缀约束,集市中的筛选条件.
+筛选条件容器为: search-advanced-pane brown filter filter-padded multiselect__element
+列表项为: 

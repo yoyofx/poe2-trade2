@@ -288,6 +288,28 @@ function parseAffix(div) {
     };
 }
 
+/**
+ * 获取页面中 .search-advanced-pane.brown 下 .filter.filter-padded 中的所有 .multiselect__element 元素
+ * @returns {NodeList} 所有符合条件的 multiselect__element 元素
+ */
+function getMultiselectElements() {
+    const advancedPane = document.querySelector('.search-advanced-pane.brown');
+    if (!advancedPane) {
+        console.warn('未找到 .search-advanced-pane.brown 元素');
+        return [];
+    }
+
+    const filterPadded = advancedPane.querySelector('.filter.filter-padded');
+    if (!filterPadded) {
+        console.warn('未找到 .filter.filter-padded 元素');
+        return [];
+    }
+
+    const multiselectElements = filterPadded.querySelectorAll('.multiselect__element');
+    console.log(`找到 ${multiselectElements.length} 个 .multiselect__element 元素`);
+    return multiselectElements;
+}
+
 // 从content中根据filter提取数值
 function extractValuesFromContent(filter, content) {
     if (!filter || !content) {

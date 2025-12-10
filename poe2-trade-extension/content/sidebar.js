@@ -441,6 +441,25 @@ class TreeView {
             };
             actions.appendChild(findSimilarBtn);
 
+            const testBtn = document.createElement('button');
+            testBtn.className = 'footer-action-btn btn-find-similar tooltip-btn';
+            testBtn.innerHTML = '🔍';
+            testBtn.title = ''; // Ensure no native title
+            testBtn.setAttribute('data-tooltip', '测试');
+            testBtn.onclick = (e) => {
+                const elements = getMultiselectElements()
+
+
+                elements.forEach(element => {
+                    //element元素span下的span下有text
+                    const text = element.querySelector('span').querySelector('span').textContent
+                    console.log(text)
+                })
+
+                console.log('testBtn clicked');
+            }
+            actions.appendChild(testBtn);
+
 
 
             details.appendChild(actions);
