@@ -73,7 +73,6 @@ function extractItemData(row, itemId) {
     // This is highly dependent on the actual DOM structure of PoE Trade site
     // get row attribate , data-id
     console.log(itemId)
-    fetchAndAnalyze('https://poe2db.tw/cn/Staves#ModifiersCalc').then(r => console.log(r));
 
     const nameEl = row.querySelector('.itemName') || row.querySelector('.name');
     const typeEl = row.querySelector('.itemType') || row.querySelector('.typeLine');
@@ -390,11 +389,11 @@ async function fetchAndAnalyze(url) {
                 // 1. 将 HTML 文本转换为虚拟 DOM
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(response.data, 'text/html');
-
+                //console.log(response.data)
                 const titles = Array.from(doc.querySelectorAll('.mod-title'));
-                const result = titles.map(el => el.innerText).join('\n');
 
-                resolve(result);
+
+                resolve(titles.map(el => el.innerText));
             } else {
                 reject(response ? response.error : 'Unknown error');
             }

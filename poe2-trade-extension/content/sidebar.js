@@ -456,7 +456,10 @@ class TreeView {
                     console.log(text)
                 })
 
-                console.log('testBtn clicked');
+                console.log('-------------------------------------------');
+
+                fetchAndAnalyze('https://poe2db.tw/cn/Staves#ModifiersCalc').then(r => console.log(r));
+
             }
             actions.appendChild(testBtn);
 
