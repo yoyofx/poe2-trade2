@@ -136,11 +136,6 @@ class TreeView {
         header.onclick = (e) => {
             e.stopPropagation();
             this.selectNode(node.id);
-            if (node.data && node.data.url) {
-                if (confirm('前往已保存的搜索?')) {
-                    window.location.href = node.data.url;
-                }
-            }
         };
 
         // Double click to rename folder
@@ -172,317 +167,376 @@ class TreeView {
         // ITEM RENDERING LOGIC
         // ============================================
         if (node.type === 'item' && node.data) {
-            // Create item name element
-            const itemName = document.createElement('div');
-            itemName.className = 'tree-label item-name';
-            itemName.textContent = node.name;
-            if (node.data.nameCss) {
-                itemName.style.cssText = node.data.nameCss;
-            }
 
-            const details = document.createElement('div');
-            details.className = 'item-details';
+            // CHECK IF THIS IS A SAVED SEARCH OR A TRADE ITEM
+            const isSavedSearch = node.data.url !== undefined;
 
-            // Create a wrapper for category and name to display on same line
-            const nameRow = document.createElement('div');
-            nameRow.className = 'item-name-row';
+            if (isSavedSearch) {
+                // --- RENDER SAVED SEARCH ---
+                const itemName = document.createElement('div');
+                itemName.className = 'tree-label item-name';
+                itemName.textContent = node.name;
 
-            // Category (first - fixed length)
-            if (node.data.category) {
-                const category = document.createElement('div');
-                category.className = 'item-category';
-                category.textContent = node.data.category;
-                nameRow.appendChild(category);
-            }
+                const details = document.createElement('div');
+                details.className = 'item-details';
 
-            // Add name after category
-            nameRow.appendChild(itemName);
+                // Name Row
+                const nameRow = document.createElement('div');
+                nameRow.className = 'item-name-row';
+                // Icon or label for search?
+                const typeTag = document.createElement('div');
+                typeTag.className = 'item-category'; // reusing class for style
+                typeTag.textContent = 'Search';
+                nameRow.appendChild(typeTag);
+                nameRow.appendChild(itemName);
+                details.appendChild(nameRow);
 
-            details.appendChild(nameRow);
+                // Actions Footer
+                const actions = document.createElement('div');
+                actions.className = 'item-actions-footer';
 
-            // Price
-            if (node.data.price) {
-                const price = document.createElement('div');
-                price.className = 'item-price';
-                price.textContent = node.data.price;
-                details.appendChild(price);
-            }
-
-            // Skills
-            if (node.data.skills && node.data.skills.length > 0) {
-                const skillsList = document.createElement('div');
-                skillsList.className = 'item-section item-skills';
-                node.data.skills.forEach(skill => {
-                    const skillEl = document.createElement('div');
-                    skillEl.className = 'item-skill-row';
-
-                    let iconHtml = '';
-                    if (skill.imageUrl) {
-                        iconHtml = `<img src="${skill.imageUrl}" class="skill-icon" />`;
+                // Go to Search Button
+                const gotoBtn = document.createElement('button');
+                gotoBtn.className = 'footer-action-btn btn-jump tooltip-btn';
+                gotoBtn.innerHTML = '➜'; // Arrow icon
+                gotoBtn.setAttribute('data-tooltip', '前往已保存的搜索');
+                gotoBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm('前往已保存的搜索?')) {
+                        window.location.href = node.data.url;
                     }
+                };
+                actions.appendChild(gotoBtn);
 
-                    skillEl.innerHTML = `${iconHtml}<span class="skill-text">${skill.level ? `Lv: ${skill.level} ` : ''}${skill.name}</span>`;
-                    skillsList.appendChild(skillEl);
-                });
-                details.appendChild(skillsList);
-            }
-
-            // Helper function to render affixes
-            const renderAffixSection = (affixArray, sectionClass, sectionLabel) => {
-                if (affixArray && affixArray.length > 0) {
-                    const section = document.createElement('div');
-                    section.className = `item-section ${sectionClass}`;
-
-                    if (sectionLabel) {
-                        const label = document.createElement('div');
-                        label.className = 'section-label';
-                        label.textContent = sectionLabel;
-                        section.appendChild(label);
+                // Delete Button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'footer-action-btn btn-delete tooltip-btn';
+                deleteBtn.innerHTML = '🗑';
+                deleteBtn.setAttribute('data-tooltip', '删除');
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm('确定要删除这个搜索吗?')) {
+                        this.deleteNode(node.id);
                     }
+                };
+                actions.appendChild(deleteBtn);
 
-                    affixArray.forEach(affix => {
-                        const affixEl = document.createElement('div');
-                        affixEl.className = 'item-affix';
+                details.appendChild(actions);
+                el.appendChild(details);
 
-                        // Add tier class for highlighting
-                        if (affix.tier === 1) {
-                            affixEl.classList.add('item-affix-t1');
-                        } else if (affix.tier === 2) {
-                            affixEl.classList.add('item-affix-t2');
+            } else {
+                // --- RENDER TRADE ITEM --- (Existing Logic)
+                // Create item name element
+                const itemName = document.createElement('div');
+                itemName.className = 'tree-label item-name';
+                itemName.textContent = node.name;
+                if (node.data.nameCss) {
+                    itemName.style.cssText = node.data.nameCss;
+                }
+
+                const details = document.createElement('div');
+                details.className = 'item-details';
+
+                // Create a wrapper for category and name to display on same line
+                const nameRow = document.createElement('div');
+                nameRow.className = 'item-name-row';
+
+                // Category (first - fixed length)
+                if (node.data.category) {
+                    const category = document.createElement('div');
+                    category.className = 'item-category';
+                    category.textContent = node.data.category;
+                    nameRow.appendChild(category);
+                }
+
+                // Add name after category
+                nameRow.appendChild(itemName);
+                details.appendChild(nameRow);
+
+                // Price
+                if (node.data.price) {
+                    const price = document.createElement('div');
+                    price.className = 'item-price';
+                    price.textContent = node.data.price;
+                    details.appendChild(price);
+                }
+
+                // Skills
+                if (node.data.skills && node.data.skills.length > 0) {
+                    const skillsList = document.createElement('div');
+                    skillsList.className = 'item-section item-skills';
+                    node.data.skills.forEach(skill => {
+                        const skillEl = document.createElement('div');
+                        skillEl.className = 'item-skill-row';
+
+                        let iconHtml = '';
+                        if (skill.imageUrl) {
+                            iconHtml = `<img src="${skill.imageUrl}" class="skill-icon" />`;
                         }
 
-                        // Add type class
-                        if (affix.isPrefix !== null) {
-                            affixEl.classList.add(affix.isPrefix ? 'type-prefix' : 'type-suffix');
+                        skillEl.innerHTML = `${iconHtml}<span class="skill-text">${skill.level ? `Lv: ${skill.level} ` : ''}${skill.name}</span>`;
+                        skillsList.appendChild(skillEl);
+                    });
+                    details.appendChild(skillsList);
+                }
+
+                // Helper function to render affixes
+                const renderAffixSection = (affixArray, sectionClass, sectionLabel) => {
+                    if (affixArray && affixArray.length > 0) {
+                        const section = document.createElement('div');
+                        section.className = `item-section ${sectionClass}`;
+
+                        if (sectionLabel) {
+                            const label = document.createElement('div');
+                            label.className = 'section-label';
+                            label.textContent = sectionLabel;
+                            section.appendChild(label);
                         }
 
-                        // Type tag (前缀/后缀)
-                        if (affix.isPrefix !== null) {
-                            const typeTag = document.createElement('span');
-                            typeTag.className = 'affix-type-tag';
-                            typeTag.textContent = affix.isPrefix ? '前缀' : '后缀';
-                            affixEl.appendChild(typeTag);
-                        }
+                        affixArray.forEach(affix => {
+                            const affixEl = document.createElement('div');
+                            affixEl.className = 'item-affix';
 
-                        // Tier tag (T1/T2/T3...)
-                        if (affix.tier !== null) {
-                            const tierTag = document.createElement('span');
-                            tierTag.className = 'affix-tier';
-                            tierTag.textContent = `T${affix.tier}`;
-                            affixEl.appendChild(tierTag);
-                        }
-
-                        // Range tag (always an array now)
-                        if (affix.tierRange && affix.tierRange.length > 0) {
-                            const rangeTag = document.createElement('span');
-                            rangeTag.className = 'affix-range';
-                            const rangeTexts = affix.tierRange.map(range => {
-                                // Only show range if min !== max
-                                if (range.min === range.max) return null;
-                                const minFormatted = range.min % 1 === 0 ? range.min : range.min.toFixed(1);
-                                const maxFormatted = range.max % 1 === 0 ? range.max : range.max.toFixed(1);
-                                return `[${minFormatted}-${maxFormatted}]`;
-                            }).filter(Boolean); // remove nulls
-
-                            if (rangeTexts.length > 0) {
-                                rangeTag.textContent = rangeTexts.join(' ');
-                                affixEl.appendChild(rangeTag);
+                            // Add tier class for highlighting
+                            if (affix.tier === 1) {
+                                affixEl.classList.add('item-affix-t1');
+                            } else if (affix.tier === 2) {
+                                affixEl.classList.add('item-affix-t2');
                             }
+
+                            // Add type class
+                            if (affix.isPrefix !== null) {
+                                affixEl.classList.add(affix.isPrefix ? 'type-prefix' : 'type-suffix');
+                            }
+
+                            // Type tag (前缀/后缀)
+                            if (affix.isPrefix !== null) {
+                                const typeTag = document.createElement('span');
+                                typeTag.className = 'affix-type-tag';
+                                typeTag.textContent = affix.isPrefix ? '前缀' : '后缀';
+                                affixEl.appendChild(typeTag);
+                            }
+
+                            // Tier tag (T1/T2/T3...)
+                            if (affix.tier !== null) {
+                                const tierTag = document.createElement('span');
+                                tierTag.className = 'affix-tier';
+                                tierTag.textContent = `T${affix.tier}`;
+                                affixEl.appendChild(tierTag);
+                            }
+
+                            // Range tag (always an array now)
+                            if (affix.tierRange && affix.tierRange.length > 0) {
+                                const rangeTag = document.createElement('span');
+                                rangeTag.className = 'affix-range';
+                                const rangeTexts = affix.tierRange.map(range => {
+                                    // Only show range if min !== max
+                                    if (range.min === range.max) return null;
+                                    const minFormatted = range.min % 1 === 0 ? range.min : range.min.toFixed(1);
+                                    const maxFormatted = range.max % 1 === 0 ? range.max : range.max.toFixed(1);
+                                    return `[${minFormatted}-${maxFormatted}]`;
+                                }).filter(Boolean); // remove nulls
+
+                                if (rangeTexts.length > 0) {
+                                    rangeTag.textContent = rangeTexts.join(' ');
+                                    affixEl.appendChild(rangeTag);
+                                }
+                            }
+
+                            // Content text
+                            const text = document.createElement('span');
+                            text.className = 'affix-text';
+                            text.textContent = affix.content;
+                            affixEl.appendChild(text);
+
+                            section.appendChild(affixEl);
+                        });
+
+                        details.appendChild(section);
+                    }
+                };
+
+
+                // Render base/implicits (first)
+                renderAffixSection(node.data.base, 'item-base', '基底:');
+
+                // Render runes (second)
+                renderAffixSection(node.data.runes, 'item-runes', '符文:');
+
+                // Render affixes (third)
+                renderAffixSection(node.data.affixes, 'item-affixes', null);
+
+                // Render desecrates (last)
+                renderAffixSection(node.data.desecrates, 'item-desecrates', null);
+
+                // Action buttons
+                const actions = document.createElement('div');
+                actions.className = 'item-actions-footer';
+
+                // Copy Hideout button
+                const hideoutBtn = document.createElement('button');
+                hideoutBtn.className = 'footer-action-btn btn-hideout tooltip-btn';
+                hideoutBtn.innerHTML = '🏠';
+                hideoutBtn.setAttribute('data-tooltip', '跳转到藏身处');
+                hideoutBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
+                    const url = `https://poe.game.qq.com/api/trade2/fetch/${node.data.id}?query=GvjbmPOUb&realm=poe2`;
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.result.length > 0) {
+                                const whisper_token = data.result[0].listing.hideout_token;
+                                fetch(hideoutActionUrl, {
+                                    method: 'POST',
+                                    headers: {
+                                        "content-type": "application/json",
+                                        "x-requested-with": "XMLHttpRequest"
+                                    },
+                                    body: JSON.stringify({ token: whisper_token })
+                                })
+                                    .then(r => r.json())
+                                    .then(d => {
+                                        if (d.status === 200 || !d.error) {
+                                            alert('正在前往藏身处...');
+                                        } else {
+                                            alert('前往失败: ' + (d.error ? d.error.message : 'Unknown error'));
+                                        }
+                                    });
+                            }
+                        })
+                        .catch(err => console.error(err));
+                };
+
+
+                actions.appendChild(hideoutBtn);
+
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'footer-action-btn btn-delete tooltip-btn';
+                deleteBtn.innerHTML = '🗑';
+                deleteBtn.setAttribute('data-tooltip', '删除');
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm('确定要删除这个物品吗?')) {
+                        this.deleteNode(node.id);
+                    }
+                };
+                actions.appendChild(deleteBtn);
+
+                // Find Similar button (Replaces Jump)
+                const findSimilarBtn = document.createElement('button');
+                findSimilarBtn.className = 'footer-action-btn btn-find-similar tooltip-btn';
+                findSimilarBtn.innerHTML = '🔍';
+                findSimilarBtn.title = ''; // Ensure no native title
+                findSimilarBtn.setAttribute('data-tooltip', '找相似');
+                findSimilarBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    //console.log(node.data);
+                    const trade2statejson = localStorage.getItem('lscache-trade2state');
+                    const trade2state = JSON.parse(trade2statejson);
+                    //format url https://poe.game.qq.com/api/trade2/search/{trade2state.realm}/{trade2state.league}
+                    const searchApiUrl = `https://poe.game.qq.com/api/trade2/search/${trade2state.realm}/${trade2state.league}`;
+                    const searchUrl = `https://poe.game.qq.com/trade2/search/${trade2state.realm}/${trade2state.league}/`;
+
+                    //foreach node.data.affixes and add filters , that item id equal by each item.type
+                    console.log(node.data);
+                    const filters = [];
+                    node.data.affixes.forEach(affix => {
+                        var value = 0;
+                        if (affix.values !== null) {
+                            value = affix.values[0];
                         }
-
-                        // Content text
-                        const text = document.createElement('span');
-                        text.className = 'affix-text';
-                        text.textContent = affix.content;
-                        affixEl.appendChild(text);
-
-                        section.appendChild(affixEl);
+                        const type = affix.type.replace('stat.', '');
+                        filters.push({
+                            "id": type,
+                            "value": {
+                                "min": value
+                            },
+                            "disabled": false
+                        });
                     });
 
-                    details.appendChild(section);
-                }
-            };
-
-
-            // Render base/implicits (first)
-            renderAffixSection(node.data.base, 'item-base', '基底:');
-
-            // Render runes (second)
-            renderAffixSection(node.data.runes, 'item-runes', '符文:');
-
-            // Render affixes (third)
-            renderAffixSection(node.data.affixes, 'item-affixes', null);
-
-            // Render desecrates (last)
-            renderAffixSection(node.data.desecrates, 'item-desecrates', null);
-
-            // Action buttons
-            const actions = document.createElement('div');
-            actions.className = 'item-actions-footer';
-
-            // Copy Hideout button
-            const hideoutBtn = document.createElement('button');
-            hideoutBtn.className = 'footer-action-btn btn-hideout tooltip-btn';
-            hideoutBtn.innerHTML = '🏠';
-            hideoutBtn.setAttribute('data-tooltip', '跳转到藏身处');
-            hideoutBtn.onclick = (e) => {
-                e.stopPropagation();
-                const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
-                const url = `https://poe.game.qq.com/api/trade2/fetch/${node.data.id}?query=GvjbmPOUb&realm=poe2`;
-
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.result.length > 0) {
-                            const whisper_token = data.result[0].listing.hideout_token;
-                            fetch(hideoutActionUrl, {
-                                method: 'POST',
-                                headers: {
-                                    "content-type": "application/json",
-                                    "x-requested-with": "XMLHttpRequest"
-                                },
-                                body: JSON.stringify({ token: whisper_token })
-                            })
-                                .then(r => r.json())
-                                .then(d => {
-                                    if (d.status === 200 || !d.error) {
-                                        alert('正在前往藏身处...');
-                                    } else {
-                                        alert('前往失败: ' + (d.error ? d.error.message : 'Unknown error'));
-                                    }
-                                });
+                    const json = {
+                        "query": {
+                            "status": {
+                                "option": "any"
+                            },
+                            "stats": [
+                                {
+                                    "type": "and",
+                                    "filters": filters,
+                                    "disabled": false
+                                }
+                            ]
+                        },
+                        "sort": {
+                            "price": "asc"
                         }
-                    })
-                    .catch(err => console.error(err));
-            };
-
-
-            actions.appendChild(hideoutBtn);
-
-            // Delete button
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'footer-action-btn btn-delete tooltip-btn';
-            deleteBtn.innerHTML = '🗑';
-            deleteBtn.setAttribute('data-tooltip', '删除');
-            deleteBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (confirm('确定要删除这个物品吗?')) {
-                    this.deleteNode(node.id);
-                }
-            };
-            actions.appendChild(deleteBtn);
-
-            // Find Similar button (Replaces Jump)
-            const findSimilarBtn = document.createElement('button');
-            findSimilarBtn.className = 'footer-action-btn btn-find-similar tooltip-btn';
-            findSimilarBtn.innerHTML = '🔍';
-            findSimilarBtn.title = ''; // Ensure no native title
-            findSimilarBtn.setAttribute('data-tooltip', '找相似');
-            findSimilarBtn.onclick = (e) => {
-                e.stopPropagation();
-                //console.log(node.data);
-                const trade2statejson = localStorage.getItem('lscache-trade2state');
-                const trade2state = JSON.parse(trade2statejson);
-                //format url https://poe.game.qq.com/api/trade2/search/{trade2state.realm}/{trade2state.league}
-                const searchApiUrl = `https://poe.game.qq.com/api/trade2/search/${trade2state.realm}/${trade2state.league}`;
-                const searchUrl = `https://poe.game.qq.com/trade2/search/${trade2state.realm}/${trade2state.league}/`;
-
-                //foreach node.data.affixes and add filters , that item id equal by each item.type
-                console.log(node.data);
-                const filters = [];
-                node.data.affixes.forEach(affix => {
-                    var value = 0;
-                    if (affix.values !== null) {
-                        value = affix.values[0];
                     }
-                    const type = affix.type.replace('stat.', '');
-                    filters.push({
-                        "id": type,
-                        "value": {
-                            "min": value
-                        },
-                        "disabled": false
-                    });
-                });
+                    console.log(json);
 
-                const json = {
-                    "query": {
-                        "status": {
-                            "option": "any"
+                    fetch(searchApiUrl, {
+                        method: 'POST',
+                        headers: {
+                            "content-type": "application/json",
+                            "x-requested-with": "XMLHttpRequest"
                         },
-                        "stats": [
-                            {
-                                "type": "and",
-                                "filters": filters,
-                                "disabled": false
+                        body: JSON.stringify(json)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                            // 页面跳转到searchUrl + data.id, 本页刷新跳转
+                            window.location.href = searchUrl + data.id;
+                        })
+                        .catch(err => console.error(err));
+                };
+                actions.appendChild(findSimilarBtn);
+
+                const testBtn = document.createElement('button');
+                testBtn.className = 'footer-action-btn btn-find-similar tooltip-btn';
+                testBtn.innerHTML = '🔍';
+                testBtn.title = ''; // Ensure no native title
+                testBtn.setAttribute('data-tooltip', '测试');
+                testBtn.onclick = (e) => {
+                    const elements = getMultiselectElements()
+
+
+                    // console.log('-------------------------------------------');
+                    console.log(elements.length)
+                    let noDisplayCount = 0;
+                    fetchAndAnalyze(`https://poe2db.tw/cn/${itemTypeMap.get(node.data.category)}`).then(r => {
+                        elements.forEach(element => {
+                            //element元素span下的span下有text
+                            const text = element.querySelector('span').querySelector('span').textContent
+
+                            //合并r.prefixes和r.suffixes
+                            const allixes = [...r.prefixes, ...r.suffixes]
+
+
+                            // 如果 text 没有匹配任何allixes中的 sign , 将element的 class 设置为 display:none
+                            if (!allixes.some(prefix => prefix.sign === text)) {
+                                element.style.display = 'none'
+                                noDisplayCount++
                             }
-                        ]
-                    },
-                    "sort": {
-                        "price": "asc"
-                    }
+
+
+                        })
+
+                    });
+
+                    console.log(elements.length - noDisplayCount)
+
                 }
-                console.log(json);
 
-                fetch(searchApiUrl, {
-                    method: 'POST',
-                    headers: {
-                        "content-type": "application/json",
-                        "x-requested-with": "XMLHttpRequest"
-                    },
-                    body: JSON.stringify(json)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        // 页面跳转到searchUrl + data.id, 本页刷新跳转
-                        window.location.href = searchUrl + data.id;
-                    })
-                    .catch(err => console.error(err));
-            };
-            actions.appendChild(findSimilarBtn);
-
-            const testBtn = document.createElement('button');
-            testBtn.className = 'footer-action-btn btn-find-similar tooltip-btn';
-            testBtn.innerHTML = '🔍';
-            testBtn.title = ''; // Ensure no native title
-            testBtn.setAttribute('data-tooltip', '测试');
-            testBtn.onclick = (e) => {
-                const elements = getMultiselectElements()
+                actions.appendChild(testBtn);
 
 
-                // console.log('-------------------------------------------');
-                console.log(elements.length)
-                let noDisplayCount = 0;
-                fetchAndAnalyze(`https://poe2db.tw/cn/${itemTypeMap.get(node.data.category)}`).then(r => {
-                    elements.forEach(element => {
-                        //element元素span下的span下有text
-                        const text = element.querySelector('span').querySelector('span').textContent
-
-                        //合并r.prefixes和r.suffixes
-                        const allixes = [...r.prefixes, ...r.suffixes]
-
-
-                        // 如果 text 没有匹配任何allixes中的 sign , 将element的 class 设置为 display:none
-                        if (!allixes.some(prefix => prefix.sign === text)) {
-                            element.style.display = 'none'
-                            noDisplayCount++
-                        }
-
-
-                    })
-
-                });
-
-                console.log(elements.length - noDisplayCount)
-
+                details.appendChild(actions);
+                el.appendChild(details);
             }
-
-            actions.appendChild(testBtn);
-
-
-            details.appendChild(actions);
-            el.appendChild(details);
         }
 
         // Folder delete action
