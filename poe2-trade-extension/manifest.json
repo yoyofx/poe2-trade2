@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "PoE 2 Trade Helper",
-    "version": "1.0",
+    "name": "流放2国服集市助手",
+    "version": "1.1",
     "description": "流放2国服集市助手",
     "permissions": [
         "storage",
