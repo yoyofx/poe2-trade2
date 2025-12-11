@@ -447,18 +447,18 @@ class TreeView {
             testBtn.title = ''; // Ensure no native title
             testBtn.setAttribute('data-tooltip', '测试');
             testBtn.onclick = (e) => {
-                const elements = getMultiselectElements()
+                // const elements = getMultiselectElements()
 
 
-                elements.forEach(element => {
-                    //element元素span下的span下有text
-                    const text = element.querySelector('span').querySelector('span').textContent
-                    console.log(text)
-                })
+                // elements.forEach(element => {
+                //     //element元素span下的span下有text
+                //     const text = element.querySelector('span').querySelector('span').textContent
+                //     console.log(text)
+                // })
 
-                console.log('-------------------------------------------');
+                // console.log('-------------------------------------------');
 
-                fetchAndAnalyze('https://poe2db.tw/cn/Staves#ModifiersCalc').then(r => console.log(r));
+                fetchAndAnalyze(`https://poe2db.tw/cn/${itemTypeMap.get(node.data.category)}`).then(r => console.log(r));
 
             }
             actions.appendChild(testBtn);
@@ -510,8 +510,13 @@ class TreeView {
 
         return el;
     }
+
+
 }
 
+const itemTypeMap = new Map([
+    ["长杖", "Staves"],
+]);
 // ============================================
 // SIDEBAR CLASS
 // ============================================

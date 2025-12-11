@@ -386,14 +386,32 @@ async function fetchAndAnalyze(url) {
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({ action: 'fetchUrl', url: url }, (response) => {
             if (response && response.success) {
-                // 1. 将 HTML 文本转换为虚拟 DOM
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(response.data, 'text/html');
-                //console.log(response.data)
-                const titles = Array.from(doc.querySelectorAll('.mod-title'));
+                try {
+                    // 从 HTML 中提取 script 标签中的 ModsView JSON 参数
+                    const html = response.data;
 
+                    // 使用正则表达式匹配 new ModsView({...})
+                    const regex = /new\s+ModsView\s*\(\s*(\{[\s\S]*?\})\s*\)/;
+                    const match = html.match(regex);
 
-                resolve(titles.map(el => el.innerText));
+                    if (!match || !match[1]) {
+                        reject('无法找到 ModsView 的 JSON 参数');
+                        return;
+                    }
+
+                    // 提取 JSON 字符串
+                    const jsonString = match[1];
+
+                    // 解析 JSON
+                    const modsData = JSON.parse(jsonString);
+
+                    // 将解析后的数据传递给 extractPrefixesAndSuffixes
+                    const result = extractPrefixesAndSuffixes(modsData);
+
+                    resolve(result);
+                } catch (error) {
+                    reject('解析 ModsView JSON 失败: ' + error.message);
+                }
             } else {
                 reject(response ? response.error : 'Unknown error');
             }
@@ -401,5 +419,58 @@ async function fetchAndAnalyze(url) {
     });
 }
 
-// 使用示例：
-// fetchAndAnalyze('https://poe2db.tw/cn/Staves').then(div => console.log(div));
+String.prototype.toSign = function () {
+    let str = this.replace(/<\/?[^>]+(>|$)/g, ''); // 去除 HTML
+    str = str.replace(/([-|+]?\d+(?:\.\d+)?)/g, '#'); // 数字转 #
+    str = str.replace(/\(#&ndash;#\)/g, '#').replace(/\(#–#\)/g, '#'); // 范围转 #
+    str = str.replace(/ \+# /g, ' # '); // 清理 +#
+    return str.trim();
+};
+
+function extractPrefixesAndSuffixes(data) {
+    const prefixMap = new Map();
+    const suffixMap = new Map();
+
+    // 只处理 normal 普通词缀 和 desecrated 渎灵词缀 两个字段
+    const sources = ['normal', 'desecrated'];
+
+    sources.forEach(source => {
+        if (data[source] && Array.isArray(data[source])) {
+            data[source].forEach(mod => {
+                // 设置 CorrectGroup（从 ModFamilyList[0]）
+                const correctGroup = mod.ModFamilyList[0] || 'Unknown';
+
+                // 生成 sign
+                mod.sign = mod.str.toSign();
+
+                // 准备 mod 对象，仅保留要求字段
+                const modEntry = {
+                    source,
+                    sign: mod.sign,
+                    CorrectGroup: correctGroup,
+                    ModFamilyList: mod.ModFamilyList
+                };
+
+                // 使用 sign + CorrectGroup 作为唯一键进行去重
+                const uniqueKey = `${mod.sign}|${correctGroup}`;
+
+                if (mod.ModGenerationTypeID === "1") {
+                    // 前缀去重
+                    if (!prefixMap.has(uniqueKey)) {
+                        prefixMap.set(uniqueKey, modEntry);
+                    }
+                } else if (mod.ModGenerationTypeID === "2") {
+                    // 后缀去重
+                    if (!suffixMap.has(uniqueKey)) {
+                        suffixMap.set(uniqueKey, modEntry);
+                    }
+                }
+            });
+        }
+    });
+
+    return {
+        prefixes: Array.from(prefixMap.values()),
+        suffixes: Array.from(suffixMap.values())
+    };
+}
