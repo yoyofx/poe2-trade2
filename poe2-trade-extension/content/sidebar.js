@@ -356,6 +356,7 @@ class TreeView {
                     .catch(err => console.error(err));
             };
 
+
             actions.appendChild(hideoutBtn);
 
             // Delete button
@@ -447,22 +448,37 @@ class TreeView {
             testBtn.title = ''; // Ensure no native title
             testBtn.setAttribute('data-tooltip', '测试');
             testBtn.onclick = (e) => {
-                // const elements = getMultiselectElements()
+                const elements = getMultiselectElements()
 
-
-                // elements.forEach(element => {
-                //     //element元素span下的span下有text
-                //     const text = element.querySelector('span').querySelector('span').textContent
-                //     console.log(text)
-                // })
 
                 // console.log('-------------------------------------------');
+                console.log(elements.length)
+                let noDisplayCount = 0;
+                fetchAndAnalyze(`https://poe2db.tw/cn/${itemTypeMap.get(node.data.category)}`).then(r => {
+                    elements.forEach(element => {
+                        //element元素span下的span下有text
+                        const text = element.querySelector('span').querySelector('span').textContent
 
-                fetchAndAnalyze(`https://poe2db.tw/cn/${itemTypeMap.get(node.data.category)}`).then(r => console.log(r));
+                        //合并r.prefixes和r.suffixes
+                        const allixes = [...r.prefixes, ...r.suffixes]
+
+
+                        // 如果 text 没有匹配任何allixes中的 sign , 将element的 class 设置为 display:none
+                        if (!allixes.some(prefix => prefix.sign === text)) {
+                            element.style.display = 'none'
+                            noDisplayCount++
+                        }
+
+
+                    })
+
+                });
+
+                console.log(elements.length - noDisplayCount)
 
             }
-            actions.appendChild(testBtn);
 
+            actions.appendChild(testBtn);
 
 
             details.appendChild(actions);
