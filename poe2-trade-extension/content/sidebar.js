@@ -127,19 +127,24 @@ class TreeView {
         const el = document.createElement('div');
         el.className = 'tree-node';
 
-        const header = document.createElement('div');
-        header.className = 'tree-header';
-        if (this.selectedNodeId === node.id) {
-            header.classList.add('selected');
-        }
-
-        header.onclick = (e) => {
-            e.stopPropagation();
-            this.selectNode(node.id);
-        };
-
-        // Double click to rename folder
+        // ============================================
+        // FOLDER LOGIC
+        // ============================================
         if (node.type === 'folder') {
+            const header = document.createElement('div');
+            header.className = 'tree-header';
+
+            // Selection Logic (Folders Only)
+            if (this.selectedNodeId === node.id) {
+                header.classList.add('selected');
+            }
+
+            header.onclick = (e) => {
+                e.stopPropagation();
+                this.selectNode(node.id);
+            };
+
+            // Double click to rename folder
             header.ondblclick = (e) => {
                 e.stopPropagation();
                 const newName = prompt('重命名文件夹:', node.name);
@@ -148,12 +153,9 @@ class TreeView {
                     this.save();
                 }
             };
-        }
 
-        // Toggle only for folders
-        let toggle = null;
-        if (node.type === 'folder') {
-            toggle = document.createElement('span');
+            // Toggle
+            const toggle = document.createElement('span');
             toggle.className = 'tree-toggle';
             toggle.innerHTML = node.expanded ? '▼' : '▶';
             toggle.onclick = (e) => {
@@ -161,15 +163,53 @@ class TreeView {
                 node.expanded = !node.expanded;
                 this.save();
             };
+
+            // Label
+            const label = document.createElement('span');
+            label.className = 'tree-label';
+            label.textContent = node.name;
+
+            // Folder Actions
+            const actions = document.createElement('div');
+            actions.className = 'tree-actions';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'tree-action-btn';
+            deleteBtn.innerHTML = '🗑';
+            deleteBtn.title = '删除文件夹';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('确定要删除这个文件夹及其所有内容吗?')) {
+                    this.deleteNode(node.id);
+                }
+            };
+            actions.appendChild(deleteBtn);
+
+            // Accessorizes
+            header.appendChild(toggle);
+            header.appendChild(label);
+            header.appendChild(actions);
+            el.appendChild(header);
+
+            // Children Logic
+            if (node.expanded && node.children && node.children.length > 0) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tree-children';
+                node.children.forEach(child => {
+                    childrenContainer.appendChild(this.createNodeElement(child));
+                });
+                el.appendChild(childrenContainer);
+            }
         }
 
         // ============================================
-        // ITEM RENDERING LOGIC
+        // ITEM LOGIC
         // ============================================
-        if (node.type === 'item' && node.data) {
+        else if (node.type === 'item' && node.data) {
 
             // CHECK IF THIS IS A SAVED SEARCH OR A TRADE ITEM
-            const isSavedSearch = node.data.url !== undefined;
+            // const isSavedSearch = node.data.url !== undefined;
+            const isSavedSearch = this.storageKey === 'poe2_searches';
 
             if (isSavedSearch) {
                 // --- RENDER SAVED SEARCH ---
@@ -409,7 +449,6 @@ class TreeView {
                         .catch(err => console.error(err));
                 };
 
-
                 actions.appendChild(hideoutBtn);
 
                 // Delete button
@@ -537,45 +576,6 @@ class TreeView {
                 details.appendChild(actions);
                 el.appendChild(details);
             }
-        }
-
-        // Folder delete action
-        if (node.type === 'folder') {
-            // Create folder label
-            const label = document.createElement('span');
-            label.className = 'tree-label';
-            label.textContent = node.name;
-
-            const actions = document.createElement('div');
-            actions.className = 'tree-actions';
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'tree-action-btn';
-            deleteBtn.innerHTML = '🗑';
-            deleteBtn.title = '删除文件夹';
-            deleteBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (confirm('确定要删除这个文件夹及其所有内容吗?')) {
-                    this.deleteNode(node.id);
-                }
-            };
-            actions.appendChild(deleteBtn);
-
-            if (toggle) header.appendChild(toggle);
-            header.appendChild(label);
-            header.appendChild(actions);
-        }
-
-        el.appendChild(header);
-
-        // Children (only for folders)
-        if (node.type === 'folder' && node.expanded && node.children && node.children.length > 0) {
-            const childrenContainer = document.createElement('div');
-            childrenContainer.className = 'tree-children';
-            node.children.forEach(child => {
-                childrenContainer.appendChild(this.createNodeElement(child));
-            });
-            el.appendChild(childrenContainer);
         }
 
         return el;
