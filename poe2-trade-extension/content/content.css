@@ -748,6 +748,83 @@
     color: #aaddcc;
 }
 
+/* Affix Limit Section */
+#affix-limit-section {
+    margin: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #1a1a1a;
+    overflow: hidden;
+}
+
+.affix-limit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background-color: #2a2a2a;
+    cursor: pointer;
+    user-select: none;
+}
+
+.affix-limit-header:hover {
+    background-color: #333;
+}
+
+.affix-limit-title-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.affix-limit-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.affix-limit-subtitle {
+    font-size: 10px;
+    color: #888;
+}
+
+.affix-limit-toggle {
+    font-size: 12px;
+    color: #ccc;
+}
+
+.affix-limit-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.affix-limit-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px;
+    border-radius: 4px;
+    color: #eee;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.1s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.affix-limit-item:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+
+.affix-limit-item:active {
+    transform: scale(0.95);
+}
+
 .tree-header:hover .tree-actions {
     display: flex;
 }

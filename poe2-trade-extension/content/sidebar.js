@@ -587,6 +587,7 @@ class TreeView {
 const itemTypeMap = new Map([
     ["长杖", "Staves"],
 ]);
+
 // ============================================
 // SIDEBAR CLASS
 // ============================================
@@ -607,7 +608,30 @@ class Sidebar {
         this.collectionsTree = new TreeView('collections-tree', 'poe2_collections');
         this.searchesTree = new TreeView('searches-tree', 'poe2_searches');
 
+        this.renderAffixLimitGrid();
         this.loadState();
+    }
+
+    renderAffixLimitGrid() {
+        const container = this.container.querySelector('.affix-limit-content');
+        if (!container) return;
+        container.innerHTML = '';
+
+        itemTypeMap.forEach((value, key) => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'affix-limit-item';
+            itemEl.textContent = key;
+
+            // Random dark/muted color for background
+            const hue = Math.floor(Math.random() * 360);
+            itemEl.style.backgroundColor = `hsl(${hue}, 60%, 30%)`;
+
+            itemEl.onclick = () => {
+                console.log(value);
+            };
+
+            container.appendChild(itemEl);
+        });
     }
 
     createSidebarElement() {
@@ -621,7 +645,7 @@ class Sidebar {
       </div>
       <div class="sidebar-tabs">
         <div class="sidebar-tab active" data-tab="collections">物品收藏</div>
-        <div class="sidebar-tab" data-tab="searches">搜索收藏</div>
+        <div class="sidebar-tab" data-tab="searches">搜索</div>
       </div>
       <div class="sidebar-content">
         <div id="tab-collections" class="tab-pane active">
@@ -634,6 +658,17 @@ class Sidebar {
           <div class="tab-actions-sticky">
              <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
              <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
+          </div>
+          <!-- Affix Limit Section -->
+          <div id="affix-limit-section">
+              <div class="affix-limit-header">
+                  <div class="affix-limit-title-group">
+                      <span class="affix-limit-title">物品词缀限制</span>
+                      <span class="affix-limit-subtitle">词缀限制来源于流放编年史</span>
+                  </div>
+                  <span class="affix-limit-toggle">▶</span>
+              </div>
+              <div class="affix-limit-content" style="display: none;"></div>
           </div>
           <div id="searches-tree" class="tree-root"></div>
         </div>
@@ -682,6 +717,22 @@ class Sidebar {
                 this.searchesTree.addItem({ id: Date.now().toString(), name: name || '已保存的搜索', url: url });
             }
         });
+
+        // Toggle Affix Limit Section
+        const affixHeader = this.container.querySelector('.affix-limit-header');
+        if (affixHeader) {
+            affixHeader.addEventListener('click', () => {
+                const content = this.container.querySelector('.affix-limit-content');
+                const toggleBtn = this.container.querySelector('.affix-limit-toggle');
+                if (content.style.display === 'none') {
+                    content.style.display = 'grid';
+                    toggleBtn.textContent = '▼';
+                } else {
+                    content.style.display = 'none';
+                    toggleBtn.textContent = '▶';
+                }
+            });
+        }
     }
 
     toggle() {
