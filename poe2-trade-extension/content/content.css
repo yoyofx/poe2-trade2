@@ -825,6 +825,59 @@
     transform: scale(0.95);
 }
 
+.sidebar-section-header {
+    padding: 8px 10px;
+    background: linear-gradient(90deg, #222 0%, #111 100%);
+    border-bottom: 1px solid #333;
+    border-top: 1px solid #333;
+    color: var(--accent-gold);
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sidebar-section-header:hover {
+    background: linear-gradient(90deg, #2a2a2a 0%, #1a1a1a 100%);
+    color: var(--accent-gold-bright);
+}
+
+.section-toggle {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Specific content styling */
+#section-search-collections .sidebar-section-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    /* Allow scrolling */
+}
+
+#section-search-collections {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    min-height: 0;
+}
+
+#section-search-collections.expanded {
+    flex: 1 1 auto;
+}
+
+/* Enhancements don't grow, just take content space */
+#section-search-enhancements {
+    flex-shrink: 0;
+}
+
 .tree-header:hover .tree-actions {
     display: flex;
 }

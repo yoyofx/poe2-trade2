@@ -655,22 +655,41 @@ class Sidebar {
           <div id="collections-tree" class="tree-root"></div>
         </div>
         <div id="tab-searches" class="tab-pane">
-          <div class="tab-actions-sticky">
-             <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
-             <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
-          </div>
-          <!-- Affix Limit Section -->
-          <div id="affix-limit-section">
-              <div class="affix-limit-header">
-                  <div class="affix-limit-title-group">
-                      <span class="affix-limit-title">物品词缀限制</span>
-                      <span class="affix-limit-subtitle">词缀限制来源于流放编年史</span>
-                  </div>
-                  <span class="affix-limit-toggle">▶</span>
+          <!-- Section 1: Search Collections -->
+          <div class="sidebar-section expanded" id="section-search-collections">
+              <div class="sidebar-section-header">
+                  <span>搜索收藏</span>
+                  <span class="section-toggle">▼</span>
               </div>
-              <div class="affix-limit-content" style="display: none;"></div>
+              <div class="sidebar-section-content open">
+                  <div class="tab-actions-sticky">
+                     <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
+                     <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
+                  </div>
+                  <div id="searches-tree" class="tree-root"></div>
+              </div>
           </div>
-          <div id="searches-tree" class="tree-root"></div>
+          
+          <!-- Section 2: Search Enhancements -->
+          <div class="sidebar-section expanded" id="section-search-enhancements">
+              <div class="sidebar-section-header">
+                  <span>搜索增强</span>
+                  <span class="section-toggle">▼</span>
+              </div>
+              <div class="sidebar-section-content open">
+                  <!-- Affix Limit Section -->
+                  <div id="affix-limit-section">
+                      <div class="affix-limit-header">
+                          <div class="affix-limit-title-group">
+                              <span class="affix-limit-title">物品词缀限制</span>
+                              <span class="affix-limit-subtitle">词缀限制来源于流放编年史</span>
+                          </div>
+                          <span class="affix-limit-toggle">▶</span>
+                      </div>
+                      <div class="affix-limit-content" style="display: none;"></div>
+                  </div>
+              </div>
+          </div>
         </div>
       </div>
     `;
@@ -716,6 +735,33 @@ class Sidebar {
                 const url = window.location.href;
                 this.searchesTree.addItem({ id: Date.now().toString(), name: name || '已保存的搜索', url: url });
             }
+        });
+
+        // Toggle Sidebar Section Headers
+        this.container.querySelectorAll('.sidebar-section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const toggleBtn = header.querySelector('.section-toggle');
+                const section = header.parentElement;
+
+                if (content.classList.contains('open')) {
+                    content.classList.remove('open');
+                    section.classList.remove('expanded');
+                    content.style.display = 'none';
+                    toggleBtn.textContent = '▶';
+                } else {
+                    content.classList.add('open');
+                    section.classList.add('expanded');
+                    content.style.display = 'block'; // Or flex, handled by CSS usually but inline override for toggle
+                    // Better to clean style and let class handle it, but for simple toggle:
+                    if (header.parentElement.id === 'section-search-collections') {
+                        content.style.display = 'flex'; // Needs flex for tree root growth
+                    } else {
+                        content.style.display = 'block';
+                    }
+                    toggleBtn.textContent = '▼';
+                }
+            });
         });
 
         // Toggle Affix Limit Section
