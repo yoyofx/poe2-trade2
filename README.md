@@ -37,4 +37,10 @@ PoE 2 Trade Helper 的核心功能是在每个交易结果条目里植入便捷�
 # 0.2
 1. 使用编年史使用特定物品词缀约束,集市中的筛选条件.
 筛选条件容器为: search-advanced-pane brown filter filter-padded multiselect__element
-列表项为: 
+
+# 0.3
+1. 支持复制物品到 POB
+中文物品底材查询编年史 https://poe2db.tw/cn/
+查询https://poe2db.tw/cn/search?token=0fbbafb1bdbd6f745783f4a98d0a1a72575e723b262390c1b8f7398077ed8c22dc77f3&q=物品名称
+获取页面BaseType , 因为 POB 需要BaseType 来获取基底词缀
+然后将affixes 属性名 对照 en 字典进行拼接,对字典中 # 进行值替换 , 遇到如 increased 时,值%,不需要改变. 否则需要在前面 加 ( + / -) ,负数提取目前还有 bug. 如前面有+则不加任何符号.
