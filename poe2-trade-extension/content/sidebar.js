@@ -534,43 +534,43 @@ class TreeView {
                 };
                 actions.appendChild(findSimilarBtn);
 
-                const testBtn = document.createElement('button');
-                testBtn.className = 'footer-action-btn btn-find-similar tooltip-btn';
-                testBtn.innerHTML = '🔍';
-                testBtn.title = ''; // Ensure no native title
-                testBtn.setAttribute('data-tooltip', '测试');
-                testBtn.onclick = (e) => {
-                    const elements = getMultiselectElements()
+                // const testBtn = document.createElement('button');
+                // testBtn.className = 'footer-action-btn btn-find-similar tooltip-btn';
+                // testBtn.innerHTML = '🔍';
+                // testBtn.title = ''; // Ensure no native title
+                // testBtn.setAttribute('data-tooltip', '测试');
+                // testBtn.onclick = (e) => {
+                //     const elements = getMultiselectElements()
 
 
-                    // console.log('-------------------------------------------');
-                    console.log(elements.length)
-                    let noDisplayCount = 0;
-                    fetchAndAnalyze(`https://poe2db.tw/cn/${itemTypeMap.get(node.data.category)}`).then(r => {
-                        elements.forEach(element => {
-                            //element元素span下的span下有text
-                            const text = element.querySelector('span').querySelector('span').textContent
+                //     // console.log('-------------------------------------------');
+                //     console.log(elements.length)
+                //     let noDisplayCount = 0;
+                //     fetchAndAnalyze(`https://poe2db.tw/cn/${itemTypeMap.get(node.data.category)}`).then(r => {
+                //         elements.forEach(element => {
+                //             //element元素span下的span下有text
+                //             const text = element.querySelector('span').querySelector('span').textContent
 
-                            //合并r.prefixes和r.suffixes
-                            const allixes = [...r.prefixes, ...r.suffixes]
-
-
-                            // 如果 text 没有匹配任何allixes中的 sign , 将element的 class 设置为 display:none
-                            if (!allixes.some(prefix => prefix.sign === text)) {
-                                element.style.display = 'none'
-                                noDisplayCount++
-                            }
+                //             //合并r.prefixes和r.suffixes
+                //             const allixes = [...r.prefixes, ...r.suffixes]
 
 
-                        })
+                //             // 如果 text 没有匹配任何allixes中的 sign , 将element的 class 设置为 display:none
+                //             if (!allixes.some(prefix => prefix.sign === text)) {
+                //                 element.style.display = 'none'
+                //                 noDisplayCount++
+                //             }
 
-                    });
 
-                    console.log(elements.length - noDisplayCount)
+                //         })
 
-                }
+                //     });
 
-                actions.appendChild(testBtn);
+                //     console.log(elements.length - noDisplayCount)
+
+                // }
+
+                // actions.appendChild(testBtn);
 
 
                 details.appendChild(actions);
@@ -585,58 +585,76 @@ class TreeView {
 }
 
 const itemTypeMap = new Map([
-    ["爪", "Claws"],
-    ["匕首", "Daggers"],
+    // ["爪", "Claws"],
+    // ["匕首", "Daggers"],
+    // ["单手剑", "One_Hand_Swords"],
+    // ["单手斧", "One_Hand_Axes"],
+    // ["连枷", "Flails"],
+    // ["双手剑", "Two_Hand_Swords"],
+    // ["双手斧", "Two_Hand_Axes"],
+    // ["鱼竿", "Fishing_Rods"],
+    // ["陷阱", "Traps"],
     ["法杖", "Wands"],
-    ["单手剑", "One_Hand_Swords"],
-    ["单手斧", "One_Hand_Axes"],
-    ["单手锤", "One_Hand_Maces"],
-    ["短杖", "Sceptres"],
-    ["战矛", "Spears"],
-    ["连枷", "Flails"],
-    ["弓", "Bows"],
-    ["长杖", "Staves"],
-    ["双手剑", "Two_Hand_Swords"],
-    ["双手斧", "Two_Hand_Axes"],
-    ["双手锤", "Two_Hand_Maces"],
-    ["节杖", "Quarterstaves"],
-    ["鱼竿", "Fishing_Rods"],
-    ["战弩", "Crossbows"],
-    ["陷阱", "Traps"],
-    ["箭袋", "Quivers"],
-    ["盾牌", "Shields"],
-    ["轻盾", "Bucklers"],
     ["法器", "Foci"],
-    ["手套", "Gloves"],
-    ["鞋子", "Boots"],
-    ["胸甲", "Body_Armours"],
-    ["头部", "Helmets"],
+    ["长杖", "Staves"],
+    ["短杖", "Sceptres"],
+    ["节杖", "Quarterstaves"],
+    ["战矛", "Spears"],
+    ["战弩", "Crossbows"],
+    ["弓", "Bows"],
+    ["箭袋", "Quivers"],
+
     ["项链", "Amulets"],
     ["戒指", "Rings"],
     ["腰带", "Belts"],
-    ["药剂", "Flasks"],
+    ["咒符", "Charms"],
     ["生命药剂", "Life_Flasks"],
     ["魔力药剂", "Mana_Flasks"],
-    ["咒符", "Charms"],
-    ["可堆叠通货", "Stackable_Currency"],
-    ["可镶嵌", "Socketable"],
-    ["预兆", "Omen"],
-    ["液化情感", "Liquid_Emotions"],
-    ["精华", "Essence"],
-    ["裂片", "Splinter"],
-    ["催化剂", "Catalysts"],
-    ["引路石", "Waystones"],
-    ["地图碎片", "Map_Fragments"],
-    ["先祖秘藏日志", "Expedition_Logbooks"],
-    ["贪婪战书", "Inscribed_Ultimatum"],
-    ["石板", "Tablet"],
-    ["试炼硬币", "Trial_Coins"],
-    ["巅峰钥匙", "Pinnacle_Keys"],
-    ["珠宝", "Jewels"],
-    ["宝库钥匙", "Vault_Keys"],
-    ["遗物", "Relics"],
-    ["藏身处", "Hideout"],
-    ["保险箱", "Strongbox"]
+
+    ["单手锤", "One_Hand_Maces"],
+    ["双手锤", "Two_Hand_Maces"],
+    ["盾牌", "Shields"],
+    ["轻盾", "Bucklers"],
+
+
+
+    // ["手套(护甲)", "Gloves_str"],
+    // ["鞋子(护甲)", "Boots_str"],
+    // ["胸甲(护甲)", "Body_Armours_str"],
+    // ["头部(护甲)", "Helmets_str"],
+
+    // ["手套(闪避)", "Gloves_dex"],
+    // ["鞋子(闪避)", "Boots_dex"],
+    // ["胸甲(闪避)", "Body_Armours_dex"],
+    // ["头部(闪避)", "Helmets_dex"],
+
+    ["手套(护盾)", "Gloves_int"],
+    ["鞋子(护盾)", "Boots_int"],
+    ["胸甲(护盾)", "Body_Armours_int"],
+    ["头部(护盾)", "Helmets_int"],
+
+
+
+    // ["咒符", "Charms"],
+    // ["可堆叠通货", "Stackable_Currency"],
+    // ["可镶嵌", "Socketable"],
+    // ["预兆", "Omen"],
+    // ["液化情感", "Liquid_Emotions"],
+    // ["精华", "Essence"],
+    // ["裂片", "Splinter"],
+    // ["催化剂", "Catalysts"],
+    // ["引路石", "Waystones"],
+    // ["地图碎片", "Map_Fragments"],
+    // ["先祖秘藏日志", "Expedition_Logbooks"],
+    // ["贪婪战书", "Inscribed_Ultimatum"],
+    // ["石板", "Tablet"],
+    // ["试炼硬币", "Trial_Coins"],
+    // ["巅峰钥匙", "Pinnacle_Keys"],
+    // ["珠宝", "Jewels"],
+    // ["宝库钥匙", "Vault_Keys"],
+    // ["遗物", "Relics"],
+    // ["藏身处", "Hideout"],
+    // ["保险箱", "Strongbox"]
 ]);
 
 // ============================================
@@ -679,6 +697,30 @@ class Sidebar {
 
             itemEl.onclick = () => {
                 console.log(value);
+
+                const elements = getMultiselectElements()
+                console.log(elements.length)
+                fetchAndAnalyze(`https://poe2db.tw/cn/${value}`).then(r => {
+                    //合并r.prefixes和r.suffixes
+                    const allixes = [...r.prefixes, ...r.suffixes]
+                    elements.forEach(element => {
+                        //element元素span下的span下有text
+                        const text = element.querySelector('span').querySelector('span').textContent
+
+                        // text 如果 不在 allixes 中，将element的class设置为display:none 
+                        if (!allixes.some(allix => allix.sign.replace("(#—#)", "#") === text)) {
+                            element.style.display = 'none'
+                        } else {
+                            element.style.display = 'block'
+                            console.log(text)
+                        }
+
+                    })
+
+                });
+
+
+
             };
 
             container.appendChild(itemEl);
@@ -706,21 +748,7 @@ class Sidebar {
           <div id="collections-tree" class="tree-root"></div>
         </div>
         <div id="tab-searches" class="tab-pane">
-          <!-- Section 1: Search Collections -->
-          <div class="sidebar-section expanded" id="section-search-collections">
-              <div class="sidebar-section-header">
-                  <span>搜索收藏</span>
-                  <span class="section-toggle">▼</span>
-              </div>
-              <div class="sidebar-section-content open">
-                  <div class="tab-actions-sticky">
-                     <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
-                     <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
-                  </div>
-                  <div id="searches-tree" class="tree-root"></div>
-              </div>
-          </div>
-          
+
           <!-- Section 2: Search Enhancements -->
           <div class="sidebar-section expanded" id="section-search-enhancements">
               <div class="sidebar-section-header">
@@ -741,6 +769,23 @@ class Sidebar {
                   </div>
               </div>
           </div>
+
+          <!-- Section 1: Search Collections -->
+          <div class="sidebar-section expanded" id="section-search-collections">
+              <div class="sidebar-section-header">
+                  <span>搜索收藏</span>
+                  <span class="section-toggle">▼</span>
+              </div>
+              <div class="sidebar-section-content open">
+                  <div class="tab-actions-sticky">
+                     <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
+                     <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
+                  </div>
+                  <div id="searches-tree" class="tree-root"></div>
+              </div>
+          </div>
+          
+
         </div>
       </div>
     `;
