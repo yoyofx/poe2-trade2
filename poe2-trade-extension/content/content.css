@@ -825,6 +825,16 @@
     transform: scale(0.95);
 }
 
+.affix-limit-item.selected {
+    border: 2px solid var(--accent-gold);
+    box-shadow: 0 0 10px rgba(212, 180, 131, 0.5);
+    background-color: #332a1b !important;
+    /* Override random color with specialized active bg or tint? Maybe just tint */
+    background-blend-mode: overlay;
+    transform: scale(1.05);
+    z-index: 1;
+}
+
 .sidebar-section-header {
     padding: 8px 10px;
     background: linear-gradient(90deg, #222 0%, #111 100%);

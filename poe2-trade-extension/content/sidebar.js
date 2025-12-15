@@ -607,33 +607,50 @@ const itemTypeMap = new Map([
     ["项链", "Amulets"],
     ["戒指", "Rings"],
     ["腰带", "Belts"],
+    ["药剂", "Flasks"],
     ["咒符", "Charms"],
-    ["生命药剂", "Life_Flasks"],
-    ["魔力药剂", "Mana_Flasks"],
 
     ["单手锤", "One_Hand_Maces"],
     ["双手锤", "Two_Hand_Maces"],
     ["盾牌", "Shields"],
     ["轻盾", "Bucklers"],
 
+    ["生命药剂", "Life_Flasks"],
+    ["魔力药剂", "Mana_Flasks"],
 
 
-    // ["手套(护甲)", "Gloves_str"],
-    // ["鞋子(护甲)", "Boots_str"],
-    // ["胸甲(护甲)", "Body_Armours_str"],
-    // ["头部(护甲)", "Helmets_str"],
+    ["手套(护甲)", "Gloves_str"],
+    ["鞋子(护甲)", "Boots_str"],
+    ["胸甲(护甲)", "Body_Armours_str"],
+    ["头部(护甲)", "Helmets_str"],
 
-    // ["手套(闪避)", "Gloves_dex"],
-    // ["鞋子(闪避)", "Boots_dex"],
-    // ["胸甲(闪避)", "Body_Armours_dex"],
-    // ["头部(闪避)", "Helmets_dex"],
+    ["手套(闪避)", "Gloves_dex"],
+    ["鞋子(闪避)", "Boots_dex"],
+    ["胸甲(闪避)", "Body_Armours_dex"],
+    ["头部(闪避)", "Helmets_dex"],
 
     ["手套(护盾)", "Gloves_int"],
     ["鞋子(护盾)", "Boots_int"],
     ["胸甲(护盾)", "Body_Armours_int"],
     ["头部(护盾)", "Helmets_int"],
 
+    //护甲_闪避
+    ["手套(甲闪)", "Gloves_str_dex"],
+    ["鞋子(甲闪)", "Boots_str_dex"],
+    ["胸甲(甲闪)", "Body_Armours_str_dex"],
+    ["头部(甲闪)", "Helmets_str_dex"],
 
+    //护甲_护盾
+    ["手套(甲盾)", "Gloves_str_int"],
+    ["鞋子(甲盾)", "Boots_str_int"],
+    ["胸甲(甲盾)", "Body_Armours_str_int"],
+    ["头部(甲盾)", "Helmets_str_int"],
+
+    //闪避_护盾
+    ["手套(闪盾)", "Gloves_dex_int"],
+    ["鞋子(闪盾)", "Boots_dex_int"],
+    ["胸甲(闪盾)", "Body_Armours_dex_int"],
+    ["头部(闪盾)", "Helmets_dex_int"],
 
     // ["咒符", "Charms"],
     // ["可堆叠通货", "Stackable_Currency"],
@@ -696,11 +713,32 @@ class Sidebar {
             itemEl.style.backgroundColor = `hsl(${hue}, 60%, 30%)`;
 
             itemEl.onclick = () => {
-                console.log(value);
+                const isSelected = itemEl.classList.contains('selected');
+                const elements = getMultiselectElements();
 
-                const elements = getMultiselectElements()
-                console.log(elements.length)
+                // Clear previous selection
+                const prevSelected = container.querySelector('.affix-limit-item.selected');
+                if (prevSelected) {
+                    prevSelected.classList.remove('selected');
+                }
+
+                // If clicking an already selected item, we just deselected it above. 
+                // Restore visibility and return.
+                if (isSelected) {
+                    elements.forEach(element => element.style.display = '');
+                    return;
+                }
+
+                // New Selection
+                itemEl.classList.add('selected');
+
+                console.log(value);
+                console.log(elements.length);
+
                 fetchAndAnalyze(`https://poe2db.tw/cn/${value}`).then(r => {
+                    // Check if this item is still selected (user might have clicked another one quickly)
+                    if (!itemEl.classList.contains('selected')) return;
+
                     //合并r.prefixes和r.suffixes
                     const allixes = [...r.prefixes, ...r.suffixes]
                     elements.forEach(element => {
@@ -712,15 +750,10 @@ class Sidebar {
                             element.style.display = 'none'
                         } else {
                             element.style.display = 'block'
-                            console.log(text)
+                            // console.log(text)
                         }
-
                     })
-
                 });
-
-
-
             };
 
             container.appendChild(itemEl);
@@ -770,6 +803,7 @@ class Sidebar {
               </div>
           </div>
 
+
           <!-- Section 1: Search Collections -->
           <div class="sidebar-section expanded" id="section-search-collections">
               <div class="sidebar-section-header">
@@ -785,7 +819,7 @@ class Sidebar {
               </div>
           </div>
           
-
+        
         </div>
       </div>
     `;
