@@ -680,6 +680,7 @@ const itemTypeMap = new Map([
 class Sidebar {
     constructor() {
         this.isVisible = false;
+        this.isPinned = false;
         this.activeTab = 'collections';
         this.container = null;
         this.collectionsTree = null;
@@ -768,6 +769,7 @@ class Sidebar {
       </div>
       <div class="sidebar-header">
         <span>流放之路2助手</span>
+        <div id="btn-pin-sidebar" class="sidebar-pin-btn" title="固定侧边栏">📌</div>
       </div>
       <div class="sidebar-tabs">
         <div class="sidebar-tab active" data-tab="collections">物品收藏</div>
@@ -909,6 +911,33 @@ class Sidebar {
                 }
             });
         }
+
+        // Pin Button
+        const pinBtn = this.container.querySelector('#btn-pin-sidebar');
+        if (pinBtn) {
+            pinBtn.addEventListener('click', () => this.togglePin());
+        }
+    }
+
+    togglePin() {
+        this.isPinned = !this.isPinned;
+        const pinBtn = this.container.querySelector('#btn-pin-sidebar');
+
+        if (this.isPinned) {
+            pinBtn.classList.add('active');
+            document.body.style.transition = 'margin-right 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)';
+            document.body.style.marginRight = '476px';
+
+            // Ensure sidebar is open
+            if (!this.isVisible) {
+                this.isVisible = true;
+                this.container.classList.remove('collapsed');
+            }
+        } else {
+            pinBtn.classList.remove('active');
+            document.body.style.marginRight = '';
+        }
+        this.saveState();
     }
 
     toggle() {
@@ -917,6 +946,15 @@ class Sidebar {
             this.container.classList.remove('collapsed');
         } else {
             this.container.classList.add('collapsed');
+            // If closing, we must unpin because pinned implies visible space
+            if (this.isPinned) {
+                this.togglePin(); // This will flip isPinned to false and reset layout
+                // But togglePin tries to open it if !isVisible?
+                // Wait, togglePin: if(this.isPinned) -> open. 
+                // calling list.togglePin() flips isPinned to false.
+                // else branch of togglePin: resets layout.
+                // So calling togglePin() is correct.
+            }
         }
         this.saveState();
     }
