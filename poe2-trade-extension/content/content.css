@@ -487,6 +487,29 @@
 }
 
 /* Highlight Colors for T1/T2 */
+/* T0 暗金属性 */
+.item-affix-t0 .affix-type-tag {
+    background: rgba(212, 180, 131, 0.2);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+}
+
+.item-affix-t0 .affix-tier {
+    background: var(--accent-gold);
+    border-color: var(--accent-gold-bright);
+    color: #000;
+    font-weight: bold;
+    box-shadow: 0 0 5px rgba(212, 180, 131, 0.3);
+}
+
+.item-affix-t0 .affix-text {
+    color: rgb(175, 96, 37);
+    text-shadow: 0 0 3px rgba(212, 180, 131, 0.3);
+    /* font-weight: bold; */
+}
+
+
+
 .item-affix-t1 .affix-type-tag {
     background: rgba(212, 180, 131, 0.2);
     border-color: var(--accent-gold);

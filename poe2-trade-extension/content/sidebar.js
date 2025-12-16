@@ -340,8 +340,13 @@ class TreeView {
                             const affixEl = document.createElement('div');
                             affixEl.className = 'item-affix';
 
+                            if (affix.tier == null) {
+                                affix.tier = 0;
+                            }
                             // Add tier class for highlighting
-                            if (affix.tier === 1) {
+                            if (affix.tier === 0) {
+                                affixEl.classList.add('item-affix-t0');
+                            } else if (affix.tier === 1) {
                                 affixEl.classList.add('item-affix-t1');
                             } else if (affix.tier === 2) {
                                 affixEl.classList.add('item-affix-t2');
@@ -353,20 +358,27 @@ class TreeView {
                             }
 
                             // Type tag (前缀/后缀)
-                            if (affix.isPrefix !== null) {
-                                const typeTag = document.createElement('span');
-                                typeTag.className = 'affix-type-tag';
-                                typeTag.textContent = affix.isPrefix ? '前缀' : '后缀';
-                                affixEl.appendChild(typeTag);
+                            var type_tag = null;
+                            if (affix.isPrefix != null) {
+                                type_tag = affix.isPrefix ? '前缀' : '后缀';
+                            } else {
+                                type_tag = '暗金';
                             }
 
-                            // Tier tag (T1/T2/T3...)
-                            if (affix.tier !== null) {
-                                const tierTag = document.createElement('span');
-                                tierTag.className = 'affix-tier';
-                                tierTag.textContent = `T${affix.tier}`;
-                                affixEl.appendChild(tierTag);
-                            }
+                            // Type tag (前缀/后缀)
+                            const typeTag = document.createElement('span');
+                            typeTag.className = 'affix-type-tag';
+                            typeTag.textContent = type_tag;
+                            affixEl.appendChild(typeTag);
+
+
+                            // Tier tag (T1/T2/T3...) default to 1
+
+                            const tierTag = document.createElement('span');
+                            tierTag.className = 'affix-tier';
+                            tierTag.textContent = `T${affix.tier}`;
+                            affixEl.appendChild(tierTag);
+
 
                             // Range tag (always an array now)
                             if (affix.tierRange && affix.tierRange.length > 0) {
