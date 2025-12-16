@@ -714,6 +714,41 @@ class Sidebar {
         this.loadState();
     }
 
+    renderAffixInfoPanel(allixes) {
+        const panel = this.container.querySelector('#affix-info-panel');
+        const scroll = panel.querySelector('.affix-info-scroll');
+        const closeBtn = panel.querySelector('.affix-info-close');
+
+        // Clear logic
+        if (!allixes) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        scroll.innerHTML = '';
+        allixes.forEach(affix => {
+            const row = document.createElement('div');
+            row.className = 'affix-info-item';
+
+            // Set source-based class
+            if (affix.source === 'normal') {
+                row.classList.add('mod-source-normal');
+            } else if (affix.source === 'desecrated') {
+                row.classList.add('mod-source-desecrated');
+            }
+
+            row.textContent = affix.sign;
+            scroll.appendChild(row);
+        });
+
+        panel.style.display = 'block';
+
+        // Close event
+        closeBtn.onclick = () => {
+            panel.style.display = 'none';
+        }
+    }
+
     renderAffixLimitGrid() {
         const container = this.container.querySelector('.affix-limit-content');
         if (!container) return;
@@ -742,6 +777,7 @@ class Sidebar {
                 // Restore visibility and return.
                 if (isSelected) {
                     elements.forEach(element => element.style.display = '');
+                    this.renderAffixInfoPanel(null); // Hide panel
                     return;
                 }
 
@@ -757,6 +793,11 @@ class Sidebar {
 
                     //合并r.prefixes和r.suffixes
                     const allixes = [...r.prefixes, ...r.suffixes]
+                    console.log(allixes)
+
+                    // Show Info Panel
+                    this.renderAffixInfoPanel(allixes);
+
                     elements.forEach(element => {
                         //element元素span下的span下有text
                         const text = element.querySelector('span').querySelector('span').textContent;
@@ -815,6 +856,15 @@ class Sidebar {
                           <span class="affix-limit-toggle">▶</span>
                       </div>
                       <div class="affix-limit-content" style="display: none;"></div>
+                  </div>
+                  
+                  <!-- Affix Info Panel (Hidden by default) -->
+                  <div id="affix-info-panel" class="affix-info-panel" style="display: none;">
+                      <div class="affix-info-header">
+                          <span>词缀预览</span>
+                          <span class="affix-info-close" title="关闭">✕</span>
+                      </div>
+                      <div class="affix-info-scroll"></div>
                   </div>
               </div>
           </div>

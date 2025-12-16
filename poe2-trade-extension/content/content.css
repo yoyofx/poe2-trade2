@@ -132,9 +132,73 @@
     filter: grayscale(0);
     transform: rotate(45deg);
     text-shadow: 0 0 5px var(--accent-gold);
+    color: #fff;
+    border-bottom: 2px solid var(--accent-gold);
+    margin-bottom: 0;
 }
 
-/* Tabs */
+/* Affix Info Panel */
+.affix-info-panel {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--accent-gold-dim);
+    border-radius: 4px;
+    margin-top: 10px;
+    padding: 0;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+}
+
+.affix-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--accent-gold);
+}
+
+.affix-info-close {
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.affix-info-close:hover {
+    opacity: 1;
+    color: #fff;
+}
+
+.affix-info-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.affix-info-item {
+    padding: 6px 8px;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    line-height: 1.4;
+}
+
+.affix-info-item:last-child {
+    border-bottom: none;
+}
+
+.mod-source-normal {
+    color: #e0e0e0;
+}
+
+.mod-source-desecrated {
+    color: #5f5;
+    /* Bright Green */
+}
+
+/* Sidebar Sections */
 .sidebar-tabs {
     display: flex;
     background-color: var(--bg-secondary);
