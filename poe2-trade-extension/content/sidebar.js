@@ -759,10 +759,9 @@ class Sidebar {
                     const allixes = [...r.prefixes, ...r.suffixes]
                     elements.forEach(element => {
                         //element元素span下的span下有text
-                        const text = element.querySelector('span').querySelector('span').textContent
-
+                        const text = element.querySelector('span').querySelector('span').textContent;
                         // text 如果 不在 allixes 中，将element的class设置为display:none 
-                        if (!allixes.some(allix => allix.sign.replace("(#—#)", "#") === text)) {
+                        if (!allixes.some(allix => allix.sign === text)) {
                             element.style.display = 'none'
                         } else {
                             element.style.display = 'block'

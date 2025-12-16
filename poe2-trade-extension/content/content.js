@@ -422,8 +422,8 @@ async function fetchAndAnalyze(url) {
 String.prototype.toSign = function () {
     let str = this.replace(/<\/?[^>]+(>|$)/g, ''); // 去除 HTML
     str = str.replace(/([-|+]?\d+(?:\.\d+)?)/g, '#'); // 数字转 #
-    str = str.replace(/\(#&ndash;#\)/g, '#').replace(/\(#–#\)/g, '#'); // 范围转 #
-    str = str.replace(/ \+# /g, ' # '); // 清理 +#
+    str = str.replace(/\(#&ndash;#\)/g, '#').replace(/\(#–#\)/g, '#').replace(/\(#—#\)/g, '#'); // 范围转 #
+    str = str.replace(/\+\s*#/g, '#'); // 清理 +#
     return str.trim();
 };
 
@@ -442,7 +442,6 @@ function extractPrefixesAndSuffixes(data) {
 
                 // 生成 sign
                 mod.sign = mod.str.toSign();
-
                 // 准备 mod 对象，仅保留要求字段
                 const modEntry = {
                     source,
