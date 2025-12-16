@@ -250,6 +250,16 @@
     margin-left: 0;
 }
 
+.tree-node.item-node {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 15px;
+    /* Increased separation */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
 .tree-children {
     margin-left: 15px;
     border-left: 1px solid rgba(255, 255, 255, 0.05);

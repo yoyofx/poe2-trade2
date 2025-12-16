@@ -126,6 +126,9 @@ class TreeView {
     createNodeElement(node) {
         const el = document.createElement('div');
         el.className = 'tree-node';
+        if (node.type === 'item') {
+            el.classList.add('item-node');
+        }
 
         // ============================================
         // FOLDER LOGIC
