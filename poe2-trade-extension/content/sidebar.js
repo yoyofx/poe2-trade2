@@ -622,17 +622,14 @@ const itemTypeMap = new Map([
     ["项链", "Amulets"],
     ["戒指", "Rings"],
     ["腰带", "Belts"],
-    ["药剂", "Flasks"],
     ["咒符", "Charms"],
+    ["生命药剂", "Life_Flasks"],
+    ["魔力药剂", "Mana_Flasks"],
 
     ["单手锤", "One_Hand_Maces"],
     ["双手锤", "Two_Hand_Maces"],
     ["盾牌", "Shields"],
     ["轻盾", "Bucklers"],
-
-    ["生命药剂", "Life_Flasks"],
-    ["魔力药剂", "Mana_Flasks"],
-
 
     ["手套(护甲)", "Gloves_str"],
     ["鞋子(护甲)", "Boots_str"],
@@ -649,23 +646,7 @@ const itemTypeMap = new Map([
     ["胸甲(护盾)", "Body_Armours_int"],
     ["头部(护盾)", "Helmets_int"],
 
-    //护甲_闪避
-    ["手套(甲闪)", "Gloves_str_dex"],
-    ["鞋子(甲闪)", "Boots_str_dex"],
-    ["胸甲(甲闪)", "Body_Armours_str_dex"],
-    ["头部(甲闪)", "Helmets_str_dex"],
 
-    //护甲_护盾
-    ["手套(甲盾)", "Gloves_str_int"],
-    ["鞋子(甲盾)", "Boots_str_int"],
-    ["胸甲(甲盾)", "Body_Armours_str_int"],
-    ["头部(甲盾)", "Helmets_str_int"],
-
-    //闪避_护盾
-    ["手套(闪盾)", "Gloves_dex_int"],
-    ["鞋子(闪盾)", "Boots_dex_int"],
-    ["胸甲(闪盾)", "Body_Armours_dex_int"],
-    ["头部(闪盾)", "Helmets_dex_int"],
 
     // ["咒符", "Charms"],
     // ["可堆叠通货", "Stackable_Currency"],
@@ -862,7 +843,6 @@ class Sidebar {
                   <div id="affix-info-panel" class="affix-info-panel" style="display: none;">
                       <div class="affix-info-header">
                           <span>词缀预览</span>
-                          <span class="affix-info-close" title="关闭">✕</span>
                       </div>
                       <div class="affix-info-scroll"></div>
                   </div>
@@ -1008,6 +988,10 @@ class Sidebar {
         this.isVisible = !this.isVisible;
         if (this.isVisible) {
             this.container.classList.remove('collapsed');
+            // Auto-pin on expand
+            if (!this.isPinned) {
+                this.togglePin();
+            }
         } else {
             this.container.classList.add('collapsed');
             // If closing, we must unpin because pinned implies visible space
