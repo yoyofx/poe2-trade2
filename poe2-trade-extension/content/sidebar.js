@@ -147,16 +147,6 @@ class TreeView {
                 this.selectNode(node.id);
             };
 
-            // Double click to rename folder
-            header.ondblclick = (e) => {
-                e.stopPropagation();
-                const newName = prompt('重命名文件夹:', node.name);
-                if (newName && newName.trim() !== '') {
-                    node.name = newName;
-                    this.save();
-                }
-            };
-
             // Toggle
             const toggle = document.createElement('span');
             toggle.className = 'tree-toggle';
@@ -176,8 +166,23 @@ class TreeView {
             const actions = document.createElement('div');
             actions.className = 'tree-actions';
 
+            // Rename Button
+            const renameBtn = document.createElement('button');
+            renameBtn.className = 'tree-action-btn btn-rename';
+            renameBtn.innerHTML = '✎';
+            renameBtn.title = '重命名文件夹';
+            renameBtn.onclick = (e) => {
+                e.stopPropagation();
+                const newName = prompt('重命名文件夹:', node.name);
+                if (newName && newName.trim() !== '') {
+                    node.name = newName;
+                    this.save();
+                }
+            };
+            actions.appendChild(renameBtn);
+
             const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'tree-action-btn';
+            deleteBtn.className = 'tree-action-btn btn-delete';
             deleteBtn.innerHTML = '🗑';
             deleteBtn.title = '删除文件夹';
             deleteBtn.onclick = (e) => {
