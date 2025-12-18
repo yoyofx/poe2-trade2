@@ -87,7 +87,7 @@ function extractItemData(row, itemId) {
     const whisperBtn = row.querySelector('.direct-btn');
 
     // Fallback: Use full text if specific elements aren't found
-    const fullText = row.innerText.split('\n').filter(line => line.trim() !== '').join(' | ');
+    // const fullText = row.innerText.split('\n').filter(line => line.trim() !== '').join(' | ');
     const category = row.querySelector('.content .property').innerText;
     const affixes = Array.from(row.querySelectorAll('.explicitMod')).map(el => parseAffix(el));
     const implicits = Array.from(row.querySelectorAll('.implicitMod')).map(el => parseAffix(el));
@@ -101,13 +101,13 @@ function extractItemData(row, itemId) {
     let a = {
         id: itemId,
         name: (name === typeName) ? name : name + ' ' + typeName,
+        itemName: name,
+        typeName: typeName,
         nameCss: nameEl ? `color: ${window.getComputedStyle(nameEl).color}` : '',
         imageUrl: iconEl ? iconEl.src : '',
         sockets: socketCount,
         price: priceEl ? priceEl.innerText : 'Unknown Price',
         playerName: playerEl ? playerEl.innerText : null,
-        whisperBtn: whisperBtn,
-        fullText: fullText,
         affixes: affixes,
         base: implicits,
         runes: runes,

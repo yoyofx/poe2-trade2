@@ -123,7 +123,7 @@ class TreeView {
         });
     }
 
-    createNodeElement(node) {
+    createNodeElement(node, parentId = null) {
         const el = document.createElement('div');
         el.className = 'tree-node';
         if (node.type === 'item') {
@@ -204,7 +204,7 @@ class TreeView {
                 const childrenContainer = document.createElement('div');
                 childrenContainer.className = 'tree-children';
                 node.children.forEach(child => {
-                    childrenContainer.appendChild(this.createNodeElement(child));
+                    childrenContainer.appendChild(this.createNodeElement(child, node.id));
                 });
                 el.appendChild(childrenContainer);
             }
@@ -214,6 +214,14 @@ class TreeView {
         // ITEM LOGIC
         // ============================================
         else if (node.type === 'item' && node.data) {
+
+            // Auto-select parent folder on click
+            el.onclick = (e) => {
+                e.stopPropagation();
+                if (parentId) {
+                    this.selectNode(parentId);
+                }
+            };
 
             // CHECK IF THIS IS A SAVED SEARCH OR A TRADE ITEM
             // const isSavedSearch = node.data.url !== undefined;
