@@ -297,16 +297,32 @@ class TreeView {
                     nameRow.appendChild(category);
                 }
 
-                // Image
+                // Image with Wrapper
                 if (node.data.imageUrl) {
+                    const iconWrapper = document.createElement('div');
+                    iconWrapper.className = 'item-icon-wrapper';
+
                     const icon = document.createElement('img');
                     icon.src = node.data.imageUrl;
                     icon.className = 'item-icon';
-                    nameRow.appendChild(icon);
+
+                    iconWrapper.appendChild(icon);
+                    nameRow.appendChild(iconWrapper);
                 }
 
                 // Add name after category
                 nameRow.appendChild(itemName);
+
+                // Socket Count
+                if (node.data.sockets && node.data.sockets > 0) {
+                    const socketSpan = document.createElement('span');
+                    socketSpan.textContent = ` (孔数: ${node.data.sockets})`;
+                    socketSpan.style.color = '#888';
+                    socketSpan.style.fontSize = '12px';
+                    socketSpan.style.marginLeft = '4px';
+                    nameRow.appendChild(socketSpan);
+                }
+
                 details.appendChild(nameRow);
 
                 // Dynamic separator style based on item color
@@ -840,6 +856,11 @@ class Sidebar {
         <div id="tab-collections" class="tab-pane active">
           <div class="tab-actions-sticky">
              <button id="btn-add-folder-collection" class="btn-primary">+ 新建文件夹</button>
+             <div class="config-actions-row">
+                <button id="btn-export-collection" class="btn-secondary">导出配置</button>
+                <button id="btn-import-collection" class="btn-secondary">导入配置</button>
+                <input type="file" id="file-import-collection" accept=".json" style="display: none;" />
+             </div>
           </div>
           <div id="collections-tree" class="tree-root"></div>
         </div>
@@ -922,6 +943,63 @@ class Sidebar {
                 this.collectionsTree.addFolder(name);
             }
         });
+
+        // Config Export
+        const btnExport = document.getElementById('btn-export-collection');
+        if (btnExport) {
+            btnExport.addEventListener('click', () => {
+                chrome.storage.local.get(['poe2_collections'], (result) => {
+                    const data = result['poe2_collections'] || [];
+                    const jsonStr = JSON.stringify(data, null, 2);
+                    const blob = new Blob([jsonStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+
+                    const date = new Date();
+                    const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `poe2_collections_${dateStr}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            });
+        }
+
+        // Config Import Trigger
+        const btnImport = document.getElementById('btn-import-collection');
+        const fileInput = document.getElementById('file-import-collection');
+        if (btnImport && fileInput) {
+            btnImport.addEventListener('click', () => {
+                if (confirm('导入配置将覆盖当前的收藏物品，确定继续吗?')) {
+                    fileInput.click();
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (Array.isArray(data)) {
+                            chrome.storage.local.set({ 'poe2_collections': data }, () => {
+                                alert('配置导入成功!');
+                                this.collectionsTree.load(); // Reload tree
+                            });
+                        } else {
+                            alert('无效的配置文件格式 (必须是数组)');
+                        }
+                    } catch (err) {
+                        alert('JSON 解析失败: ' + err.message);
+                    }
+                    // Reset input so same file can be selected again if needed
+                    fileInput.value = '';
+                };
+                reader.readAsText(file);
+            });
+        }
 
         document.getElementById('btn-add-folder-search').addEventListener('click', () => {
             const name = prompt('文件夹名称:');
