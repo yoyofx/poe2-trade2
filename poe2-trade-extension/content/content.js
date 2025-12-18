@@ -78,6 +78,7 @@ function extractItemData(row, itemId) {
     const typeEl = row.querySelector('.itemType') || row.querySelector('.typeLine');
     const priceEl = row.querySelector('.priceBlock') || row.querySelector('.price');
     const playerEl = row.querySelector('.posted-by') || row.querySelector('.profile-link > a');
+    const iconEl = row.querySelector('.icon img');
 
     // Try to find whisper button/data
     const whisperBtn = row.querySelector('.direct-btn');
@@ -98,6 +99,7 @@ function extractItemData(row, itemId) {
         id: itemId,
         name: (name === typeName) ? name : name + ' ' + typeName,
         nameCss: nameEl ? `color: ${window.getComputedStyle(nameEl).color}` : '',
+        imageUrl: iconEl ? iconEl.src : '',
         price: priceEl ? priceEl.innerText : 'Unknown Price',
         playerName: playerEl ? playerEl.innerText : null,
         whisperBtn: whisperBtn,

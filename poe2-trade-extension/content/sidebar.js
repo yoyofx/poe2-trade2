@@ -297,6 +297,14 @@ class TreeView {
                     nameRow.appendChild(category);
                 }
 
+                // Image
+                if (node.data.imageUrl) {
+                    const icon = document.createElement('img');
+                    icon.src = node.data.imageUrl;
+                    icon.className = 'item-icon';
+                    nameRow.appendChild(icon);
+                }
+
                 // Add name after category
                 nameRow.appendChild(itemName);
                 details.appendChild(nameRow);
