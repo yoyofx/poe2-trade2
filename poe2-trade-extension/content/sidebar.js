@@ -309,6 +309,18 @@ class TreeView {
                 nameRow.appendChild(itemName);
                 details.appendChild(nameRow);
 
+                // Dynamic separator style based on item color
+                if (node.data.nameCss) {
+                    // Extract color value (e.g., from "color: rgb(...)")
+                    const match = node.data.nameCss.match(/color\s*:\s*([^;]+)/);
+                    if (match && match[1]) {
+                        const color = match[1];
+                        nameRow.style.borderBottom = `1px solid ${color}`;
+                        // Add a subtle gradient background for "Grand" feel
+                        nameRow.style.background = `linear-gradient(90deg, ${color.replace(')', ', 0.1)')} 0%, transparent 100%)`;
+                    }
+                }
+
                 // Price
                 if (node.data.price) {
                     const price = document.createElement('div');
@@ -393,6 +405,12 @@ class TreeView {
                             affixEl.appendChild(tierTag);
 
 
+                            // Content text
+                            const text = document.createElement('span');
+                            text.className = 'affix-text';
+                            text.textContent = affix.content;
+                            affixEl.appendChild(text);
+
                             // Range tag (always an array now)
                             if (affix.tierRange && affix.tierRange.length > 0) {
                                 const rangeTag = document.createElement('span');
@@ -410,12 +428,6 @@ class TreeView {
                                     affixEl.appendChild(rangeTag);
                                 }
                             }
-
-                            // Content text
-                            const text = document.createElement('span');
-                            text.className = 'affix-text';
-                            text.textContent = affix.content;
-                            affixEl.appendChild(text);
 
                             section.appendChild(affixEl);
                         });

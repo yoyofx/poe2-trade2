@@ -387,10 +387,14 @@
 .item-name-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     margin-bottom: 8px;
+    padding: 6px;
+    padding-bottom: 8px;
+    width: 100%;
+    /* Border will be set dynamically via JS */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+    border-radius: 4px 4px 0 0;
 }
 
 .item-category {
