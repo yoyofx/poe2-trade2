@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "流放2国服集市助手",
-    "version": "1.4.0b",
-    "description": "流放2国服集市助手",
+    "version": "1.4.0.1",
+    "description": "流放2(POE2)国服集市助手",
     "permissions": [
         "storage",
         "activeTab"
