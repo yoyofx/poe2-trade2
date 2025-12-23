@@ -747,7 +747,6 @@ class Sidebar {
     renderAffixInfoPanel(allixes) {
         const panel = this.container.querySelector('#affix-info-panel');
         const scroll = panel.querySelector('.affix-info-scroll');
-        const closeBtn = panel.querySelector('.affix-info-close');
 
         // Clear logic
         if (!allixes) {
@@ -773,10 +772,6 @@ class Sidebar {
 
         panel.style.display = 'block';
 
-        // Close event
-        closeBtn.onclick = () => {
-            panel.style.display = 'none';
-        }
     }
 
     renderAffixLimitGrid() {
