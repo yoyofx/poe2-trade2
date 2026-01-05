@@ -230,7 +230,7 @@ class TreeView {
             if (isSavedSearch) {
                 // --- RENDER SAVED SEARCH ---
                 const itemName = document.createElement('div');
-                itemName.className = 'tree-label item-name';
+                itemName.className = 'tree-label item-name saved-search-name';
                 itemName.textContent = node.name;
 
                 const details = document.createElement('div');
@@ -245,11 +245,10 @@ class TreeView {
                 typeTag.textContent = 'Search';
                 nameRow.appendChild(typeTag);
                 nameRow.appendChild(itemName);
-                details.appendChild(nameRow);
 
-                // Actions Footer
+                // Actions (Inline)
                 const actions = document.createElement('div');
-                actions.className = 'item-actions-footer';
+                actions.className = 'search-actions';
 
                 // Go to Search Button
                 const gotoBtn = document.createElement('button');
@@ -264,6 +263,85 @@ class TreeView {
                 };
                 actions.appendChild(gotoBtn);
 
+                // Share Button (Copy URL)
+                const shareBtn = document.createElement('button');
+                shareBtn.className = 'footer-action-btn btn-share tooltip-btn';
+                shareBtn.innerHTML = '🔗';
+                shareBtn.setAttribute('data-tooltip', '分享');
+                shareBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(node.data.url).then(() => {
+                        alert('链接已复制到剪切板!');
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                };
+                actions.appendChild(shareBtn);
+
+                // Subscribe Button (Log URL)
+                const subscribeBtn = document.createElement('button');
+                subscribeBtn.className = 'footer-action-btn btn-subscribe tooltip-btn';
+                subscribeBtn.innerHTML = '📡';
+                subscribeBtn.setAttribute('data-tooltip', '订阅');
+                subscribeBtn.onclick = (e) => {
+                    e.stopPropagation();
+
+                    const trade2statejson = localStorage.getItem('lscache-trade2state');
+                    const trade2state = JSON.parse(trade2statejson);
+                    const liveSearchApiUrl = `wss://poe.game.qq.com/api/trade2/live/${trade2state.realm}/${trade2state.league}/`;
+
+                    let searchCode = node.data.url;
+                    // Remove trailing slash if exists to avoid double slash issues or easy check
+                    if (searchCode.endsWith('/')) {
+                        searchCode = searchCode.slice(0, -1);
+                    }
+
+                    // Check if ends with /live
+                    if (searchCode.endsWith('/live')) {
+                        //remove /live
+                        searchCode = searchCode.slice(0, -5);
+                    }
+                    //取最后/后面的字符串
+                    searchCode = searchCode.slice(searchCode.lastIndexOf('/') + 1);
+
+                    console.log('searchCode:', searchCode);
+
+
+                    // Replace protocol for WebSocket
+                    // Assuming original is https or http
+                    let wsUrl = liveSearchApiUrl + searchCode;
+
+                    console.log('Connecting to WebSocket:', wsUrl);
+
+                    try {
+                        const ws = new WebSocket(wsUrl);
+
+                        ws.onopen = () => {
+                            console.log('WebSocket Connected:', wsUrl);
+                            alert('WebSocket 已连接!\nURL: ' + wsUrl);
+                        };
+
+                        ws.onmessage = (event) => {
+                            console.log('WebSocket Message Received:', event.data);
+                            // You might want to parse JSON if strictly expected, but raw log is fine for now
+                        };
+
+                        ws.onerror = (error) => {
+                            console.error('WebSocket Error:', error);
+                            // alert('WebSocket Error. Check console.');
+                        };
+
+                        ws.onclose = () => {
+                            console.log('WebSocket Disconnected');
+                        };
+
+                    } catch (err) {
+                        console.error('Failed to create WebSocket:', err);
+                        alert('无法建立 WebSocket 连接: ' + err.message);
+                    }
+                };
+                actions.appendChild(subscribeBtn);
+
                 // Delete Button
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'footer-action-btn btn-delete tooltip-btn';
@@ -277,7 +355,8 @@ class TreeView {
                 };
                 actions.appendChild(deleteBtn);
 
-                details.appendChild(actions);
+                nameRow.appendChild(actions);
+                details.appendChild(nameRow);
                 el.appendChild(details);
 
             } else {

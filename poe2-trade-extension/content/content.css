@@ -324,11 +324,11 @@
 
 .tree-node.item-node {
     background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(212, 180, 131, 0.4);
+    /* Light Gold */
     border-radius: 4px;
-    padding: 8px;
-    margin-bottom: 15px;
-    /* Increased separation */
+    padding: 5px;
+    margin-bottom: 3px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
@@ -1317,4 +1317,26 @@
 
 .item-desecrates .item-affix .affix-text {
     color: #00FF00;
+}
+
+/* Saved Search Styling */
+.saved-search-name {
+    color: #8da6e4;
+    /* Light Blue to match Prefix style */
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.search-actions {
+    margin-left: auto;
+    /* Push to the right */
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.search-actions .footer-action-btn {
+    /* Slightly smaller or adjusted if needed, but inheriting is fine */
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
 }
