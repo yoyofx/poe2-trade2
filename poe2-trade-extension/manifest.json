@@ -13,6 +13,7 @@
                 "*://poe.game.qq.com/trade2/*"
             ],
             "js": [
+                "content/subscription_manager.js",
                 "content/sidebar.js",
                 "content/content.js"
             ],

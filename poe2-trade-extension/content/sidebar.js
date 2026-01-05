@@ -313,31 +313,15 @@ class TreeView {
 
                     console.log('Connecting to WebSocket:', wsUrl);
 
-                    try {
-                        const ws = new WebSocket(wsUrl);
-
-                        ws.onopen = () => {
-                            console.log('WebSocket Connected:', wsUrl);
-                            alert('WebSocket 已连接!\nURL: ' + wsUrl);
-                        };
-
-                        ws.onmessage = (event) => {
-                            console.log('WebSocket Message Received:', event.data);
-                            // You might want to parse JSON if strictly expected, but raw log is fine for now
-                        };
-
-                        ws.onerror = (error) => {
-                            console.error('WebSocket Error:', error);
-                            // alert('WebSocket Error. Check console.');
-                        };
-
-                        ws.onclose = () => {
-                            console.log('WebSocket Disconnected');
-                        };
-
-                    } catch (err) {
-                        console.error('Failed to create WebSocket:', err);
-                        alert('无法建立 WebSocket 连接: ' + err.message);
+                    if (window.subscriptionManager) {
+                        window.subscriptionManager.subscribe(searchCode, wsUrl, (sourceId, data) => {
+                            console.log(`[Callback] Message from ${sourceId}:`, data);
+                            // TODO: Add notification logic here
+                            // if (data.new && data.new.length > 0) ...
+                        });
+                    } else {
+                        console.error('SubscriptionManager not found!');
+                        alert('订阅管理器未加载，请刷新页面重试。');
                     }
                 };
                 actions.appendChild(subscribeBtn);
@@ -951,7 +935,7 @@ class Sidebar {
           <!-- Section 2: Search Enhancements -->
           <div class="sidebar-section expanded" id="section-search-enhancements">
               <div class="sidebar-section-header">
-                  <span>搜索增强</span>
+                  <span>搜索词缀预览</span>
                   <span class="section-toggle">▼</span>
               </div>
               <div class="sidebar-section-content open">
