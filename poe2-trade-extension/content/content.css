@@ -1340,3 +1340,29 @@
     background: rgba(0, 0, 0, 0.5);
     border-color: rgba(255, 255, 255, 0.1);
 }
+/* Compact Saved Search Items */
+.tree-node.saved-search-node {
+    padding: 3px;
+    margin-bottom: 2px;
+}
+
+.saved-search-node .item-details {
+    margin-top: 0;
+}
+
+.saved-search-node .item-name-row {
+    margin-bottom: 0;
+    padding: 2px 6px;
+    min-height: 28px;
+}
+
+.saved-search-node .footer-action-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
+}
+
+.saved-search-node .item-category {
+    padding: 1px 6px;
+    font-size: 11px;
+}

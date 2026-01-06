@@ -228,6 +228,7 @@ class TreeView {
             const isSavedSearch = this.storageKey === 'poe2_searches';
 
             if (isSavedSearch) {
+                el.classList.add('saved-search-node');
                 // --- RENDER SAVED SEARCH ---
                 const itemName = document.createElement('div');
                 itemName.className = 'tree-label item-name saved-search-name';
@@ -932,6 +933,22 @@ class Sidebar {
         </div>
         <div id="tab-searches" class="tab-pane">
 
+           <!-- Section 1: Search Collections -->
+          <div class="sidebar-section expanded" id="section-search-collections">
+              <div class="sidebar-section-header">
+                  <span>搜索收藏</span>
+                  <span class="section-toggle">▼</span>
+              </div>
+              <div class="sidebar-section-content open">
+                  <div class="tab-actions-sticky">
+                     <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
+                     <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
+                  </div>
+                  <div id="searches-tree" class="tree-root"></div>
+              </div>
+          </div>
+          
+
           <!-- Section 2: Search Enhancements -->
           <div class="sidebar-section expanded" id="section-search-enhancements">
               <div class="sidebar-section-header">
@@ -961,22 +978,6 @@ class Sidebar {
               </div>
           </div>
 
-
-          <!-- Section 1: Search Collections -->
-          <div class="sidebar-section expanded" id="section-search-collections">
-              <div class="sidebar-section-header">
-                  <span>搜索收藏</span>
-                  <span class="section-toggle">▼</span>
-              </div>
-              <div class="sidebar-section-content open">
-                  <div class="tab-actions-sticky">
-                     <button id="btn-add-folder-search" class="btn-primary">+ 新建文件夹</button>
-                     <button id="btn-save-search" class="btn-primary">保存当前搜索</button>
-                  </div>
-                  <div id="searches-tree" class="tree-root"></div>
-              </div>
-          </div>
-          
         
         </div>
       </div>
