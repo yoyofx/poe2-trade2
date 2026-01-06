@@ -320,6 +320,10 @@ class TreeView {
                             // TODO: Add notification logic here
                             // if (data.new && data.new.length > 0) ...
                         });
+
+                        if (window.poe2SidebarInstance) {
+                            window.poe2SidebarInstance.addSubscriptionToUI(searchCode, wsUrl, node.name);
+                        }
                     } else {
                         console.error('SubscriptionManager not found!');
                         alert('订阅管理器未加载，请刷新页面重试。');
@@ -806,6 +810,64 @@ class Sidebar {
 
         this.renderAffixLimitGrid();
         this.loadState();
+        window.poe2SidebarInstance = this;
+    }
+
+    addSubscriptionToUI(id, url, name) {
+        // Show the panel
+        const section = this.container.querySelector('#section-subscription-management');
+        const list = section.querySelector('.subscription-list');
+        section.style.display = 'flex'; // Make visible
+
+        // Expand if needed
+        if (!section.classList.contains('expanded')) {
+            section.querySelector('.sidebar-section-header').click();
+        }
+
+        // Check for duplicate
+        if (list.querySelector(`.subscription-item[data-id="${id}"]`)) return;
+
+        const item = document.createElement('div');
+        item.className = 'subscription-item';
+        item.dataset.id = id;
+
+        item.innerHTML = `
+            <div class="sub-icon-wrapper">
+                <svg class="sub-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+            </div>
+            <div class="sub-info">
+                <div class="sub-name" title="${name}">${name}</div>
+                <div class="sub-status">正在监听...</div>
+            </div>
+            <button class="sub-close-btn" title="取消订阅">×</button>
+        `;
+
+        item.querySelector('.sub-close-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.subscriptionManager) {
+                window.subscriptionManager.unsubscribe(id);
+            }
+            this.removeSubscriptionFromUI(id);
+        });
+
+        list.appendChild(item);
+        list.style.display = 'block'; // Ensure list is visible
+    }
+
+    removeSubscriptionFromUI(id) {
+        const list = this.container.querySelector('#section-subscription-management .subscription-list');
+        const item = list.querySelector(`.subscription-item[data-id="${id}"]`);
+        if (item) {
+            item.remove();
+        }
+
+        // Hide section if empty? Optional
+        if (list.children.length === 0) {
+            const section = this.container.querySelector('#section-subscription-management');
+            // section.style.display = 'none'; // Maybe keep it visible but empty?
+        }
     }
 
     renderAffixInfoPanel(allixes) {
@@ -932,6 +994,17 @@ class Sidebar {
           <div id="collections-tree" class="tree-root"></div>
         </div>
         <div id="tab-searches" class="tab-pane">
+           
+           <!-- Section 0: Subscription Management -->
+           <div class="sidebar-section" id="section-subscription-management" style="display: flex; flex-direction: column;">
+               <div class="sidebar-section-header">
+                   <span>订阅管理</span>
+                   <span class="section-toggle">▶</span>
+               </div>
+               <div class="sidebar-section-content">
+                   <div class="subscription-list"></div>
+               </div>
+           </div>
 
            <!-- Section 1: Search Collections -->
           <div class="sidebar-section expanded" id="section-search-collections">

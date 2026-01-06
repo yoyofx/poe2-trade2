@@ -796,6 +796,130 @@
     margin-top: 5px;
 }
 
+
+/* Subscription Management Panel */
+.subscription-panel {
+    border-top: 1px solid var(--border-metallic);
+    margin-top: 10px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.subscription-header {
+    padding: 10px;
+    font-size: 14px;
+    color: var(--accent-gold);
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.subscription-header:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.subscription-list {
+    padding: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    /* Collapsed by default */
+}
+
+.subscription-list.expanded {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.subscription-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(212, 180, 131, 0.2);
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.subscription-item:hover {
+    border-color: var(--accent-gold-dim);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sub-icon-wrapper {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-gold-bright);
+}
+
+/* Rotating Glow Animation */
+@keyframes spin-glow {
+    0% {
+        transform: rotate(0deg);
+        filter: drop-shadow(0 0 2px var(--accent-gold));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 8px var(--accent-gold-bright));
+    }
+
+    100% {
+        transform: rotate(360deg);
+        filter: drop-shadow(0 0 2px var(--accent-gold));
+    }
+}
+
+.sub-icon-svg {
+    width: 20px;
+    height: 20px;
+    animation: spin-glow 3s linear infinite;
+}
+
+.sub-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.sub-name {
+    font-size: 13px;
+    color: var(--text-highlight);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.sub-status {
+    font-size: 11px;
+    color: #4a6;
+}
+
+.sub-close-btn {
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+    border-radius: 50%;
+}
+
+.sub-close-btn:hover {
+    color: #ff5555;
+    background: rgba(255, 0, 0, 0.1);
+}
+
 .btn-secondary {
     flex: 1;
     background: #1a1a1a;
@@ -1340,6 +1464,7 @@
     background: rgba(0, 0, 0, 0.5);
     border-color: rgba(255, 255, 255, 0.1);
 }
+
 /* Compact Saved Search Items */
 .tree-node.saved-search-node {
     padding: 3px;
