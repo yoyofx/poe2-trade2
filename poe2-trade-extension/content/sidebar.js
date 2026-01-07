@@ -317,7 +317,9 @@ class TreeView {
                     if (window.subscriptionManager) {
                         window.subscriptionManager.subscribe(searchCode, wsUrl, (sourceId, data) => {
                             console.log(`[Callback] Message from ${sourceId}:`, data);
-
+                            if (data.result == undefined) {
+                                return;
+                            }
                             // Notify Background
                             const itemId = data.result;
                             chrome.runtime.sendMessage({
