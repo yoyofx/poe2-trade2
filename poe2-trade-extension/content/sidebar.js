@@ -317,9 +317,7 @@ class TreeView {
                     if (window.subscriptionManager) {
                         window.subscriptionManager.subscribe(searchCode, wsUrl, (sourceId, data) => {
                             console.log(`[Callback] Message from ${sourceId}:`, data);
-                            if (data.result == undefined) {
-                                return;
-                            }
+
                             // Notify Background
                             const itemId = data.result;
                             chrome.runtime.sendMessage({
@@ -1273,6 +1271,50 @@ class Sidebar {
         this.collectionsTree.deleteNode(itemId);
     }
 
+    funcjumpToHideout(request) {
+        //fetch url by https://poe.game.qq.com/api/trade2/fetch/{request.queryItemId}?query=Rry0VrOi7&realm=poe2
+        const fetchUrl = `https://poe.game.qq.com/api/trade2/fetch/${request.queryItemId}?query=Rry0VrOi7&realm=poe2`;
+        fetch(fetchUrl)
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.result) {
+                    const top1Item = data.result[0]
+                    this.jumpToHideoutByToken(top1Item.listing.hideout_token)
+                }
+
+            })
+            .catch(error => {
+                console.error('Error in fetch:', error);
+            });
+
+
+    }
+
+
+    jumpToHideoutByToken(token) {
+        const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
+        fetch(hideoutActionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "x-requested-with": "XMLHttpRequest"
+            },
+            body: JSON.stringify({
+                token: token
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 200 || !data.error) {
+                    alert('正在前往藏身处...');
+                } else {
+                    alert('前往失败: ' + (data.error ? data.error.message : 'Unknown error'));
+                }
+            })
+
+    }
+
     jumpToHideout(itemId) {
         const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
         // Note: The query ID 'GvjbmPOUb' might need to be dynamic or fetched from state.
@@ -1319,9 +1361,9 @@ class Sidebar {
 
 // Global Message Listener for Notification Actions
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'jumpToHideout' && request.itemId) {
+    if (request.action === 'jumpToHideout' && request.request) {
         if (window.poe2SidebarInstance) {
-            window.poe2SidebarInstance.jumpToHideout(request.itemId);
+            window.poe2SidebarInstance.funcjumpToHideout(request.request);
         }
     }
 });
