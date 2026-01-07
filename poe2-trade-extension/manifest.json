@@ -5,7 +5,8 @@
     "description": "POE流放2国服集市助手",
     "permissions": [
         "storage",
-        "activeTab"
+        "activeTab",
+        "notifications"
     ],
     "content_scripts": [
         {

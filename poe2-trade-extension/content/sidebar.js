@@ -317,8 +317,16 @@ class TreeView {
                     if (window.subscriptionManager) {
                         window.subscriptionManager.subscribe(searchCode, wsUrl, (sourceId, data) => {
                             console.log(`[Callback] Message from ${sourceId}:`, data);
-                            // TODO: Add notification logic here
-                            // if (data.new && data.new.length > 0) ...
+
+                            // Notify Background
+                            const itemId = data.result;
+                            chrome.runtime.sendMessage({
+                                action: 'notify',
+                                title: '搜到新物品!',
+                                message: `订阅发现了 ${data.count} 个符合条件新物品`,
+                                notificationId: `notify-${itemId}`
+                            });
+
                         });
 
                         if (window.poe2SidebarInstance) {
@@ -552,33 +560,9 @@ class TreeView {
                 hideoutBtn.setAttribute('data-tooltip', '跳转到藏身处');
                 hideoutBtn.onclick = (e) => {
                     e.stopPropagation();
-                    const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
-                    const url = `https://poe.game.qq.com/api/trade2/fetch/${node.data.id}?query=GvjbmPOUb&realm=poe2`;
-
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.result.length > 0) {
-                                const whisper_token = data.result[0].listing.hideout_token;
-                                fetch(hideoutActionUrl, {
-                                    method: 'POST',
-                                    headers: {
-                                        "content-type": "application/json",
-                                        "x-requested-with": "XMLHttpRequest"
-                                    },
-                                    body: JSON.stringify({ token: whisper_token })
-                                })
-                                    .then(r => r.json())
-                                    .then(d => {
-                                        if (d.status === 200 || !d.error) {
-                                            alert('正在前往藏身处...');
-                                        } else {
-                                            alert('前往失败: ' + (d.error ? d.error.message : 'Unknown error'));
-                                        }
-                                    });
-                            }
-                        })
-                        .catch(err => console.error(err));
+                    if (window.poe2SidebarInstance) {
+                        window.poe2SidebarInstance.jumpToHideout(node.data.id);
+                    }
                 };
 
                 actions.appendChild(hideoutBtn);
@@ -1286,6 +1270,58 @@ class Sidebar {
     removeFromCollection(itemId) {
         this.collectionsTree.deleteNode(itemId);
     }
+
+    jumpToHideout(itemId) {
+        const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
+        // Note: The query ID 'GvjbmPOUb' might need to be dynamic or fetched from state.
+        // For now, using the one present in original code or try to get it from local storage state if possible?
+        // trade2state usually has request ID? No. 
+        // Using a generic fetch might work if the session is valid. 
+        // Actually, the query parameter is required by the API to link the fetch to a search context.
+        // We will try without it or use a placeholder if the original code had it hardcoded.
+        // Original: query=GvjbmPOUb
+        const url = `https://poe.game.qq.com/api/trade2/fetch/${itemId}?query=GvjbmPOUb&realm=poe2`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.result && data.result.length > 0) {
+                    const listing = data.result[0].listing;
+                    if (!listing) {
+                        console.error('No listing found');
+                        return;
+                    }
+                    const whisper_token = listing.hideout_token;
+
+                    fetch(hideoutActionUrl, {
+                        method: 'POST',
+                        headers: {
+                            "content-type": "application/json",
+                            "x-requested-with": "XMLHttpRequest"
+                        },
+                        body: JSON.stringify({ token: whisper_token })
+                    })
+                        .then(r => r.json())
+                        .then(d => {
+                            if (d.status === 200 || !d.error) {
+                                alert('正在前往藏身处...');
+                            } else {
+                                alert('前往失败: ' + (d.error ? d.error.message : 'Unknown error'));
+                            }
+                        });
+                }
+            })
+            .catch(err => console.error('Fetch error:', err));
+    }
 }
+
+// Global Message Listener for Notification Actions
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'jumpToHideout' && request.itemId) {
+        if (window.poe2SidebarInstance) {
+            window.poe2SidebarInstance.jumpToHideout(request.itemId);
+        }
+    }
+});
 
 window.PoE2Sidebar = Sidebar;
