@@ -318,14 +318,17 @@ class TreeView {
                         window.subscriptionManager.subscribe(searchCode, wsUrl, (sourceId, data) => {
                             console.log(`[Callback] Message from ${sourceId}:`, data);
 
-                            // Notify Background
-                            const itemId = data.result;
-                            chrome.runtime.sendMessage({
-                                action: 'notify',
-                                title: '搜到新物品!',
-                                message: `订阅发现了 ${data.count} 个符合条件新物品`,
-                                notificationId: `notify-${itemId}`
-                            });
+                            if (data.result) {
+                                // Notify Background
+                                const itemId = data.result;
+                                chrome.runtime.sendMessage({
+                                    action: 'notify',
+                                    title: node.name,
+                                    message: `订阅发现了 ${data.count} 个符合条件新物品`,
+                                    notificationId: searchCode,
+                                    queryItemId: data.result
+                                });
+                            }
 
                         });
 
