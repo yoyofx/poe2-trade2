@@ -16,7 +16,12 @@ class TreeView {
     }
 
     save() {
-        chrome.storage.local.set({ [this.storageKey]: this.data });
+        const dataToSave = { [this.storageKey]: this.data };
+        const trade2state = getTrade2State();
+        if (trade2state && trade2state.league) {
+            dataToSave['version'] = trade2state.league;
+        }
+        chrome.storage.local.set(dataToSave);
         this.render();
     }
 
@@ -287,8 +292,11 @@ class TreeView {
                 subscribeBtn.onclick = (e) => {
                     e.stopPropagation();
 
-                    const trade2statejson = localStorage.getItem('lscache-trade2state');
-                    const trade2state = JSON.parse(trade2statejson);
+                    const trade2state = getTrade2State();
+                    if (!trade2state) {
+                        alert('无法获取当前赛季信息，请刷新页面重试。');
+                        return;
+                    }
                     const liveSearchApiUrl = `wss://poe.game.qq.com/api/trade2/live/${trade2state.realm}/${trade2state.league}/`;
 
                     let searchCode = node.data.url;
@@ -590,8 +598,11 @@ class TreeView {
                 findSimilarBtn.onclick = (e) => {
                     e.stopPropagation();
                     //console.log(node.data);
-                    const trade2statejson = localStorage.getItem('lscache-trade2state');
-                    const trade2state = JSON.parse(trade2statejson);
+                    const trade2state = getTrade2State();
+                    if (!trade2state) {
+                        alert('无法获取当前赛季信息，请刷新页面重试。');
+                        return;
+                    }
                     //format url https://poe.game.qq.com/api/trade2/search/{trade2state.realm}/{trade2state.league}
                     const searchApiUrl = `https://poe.game.qq.com/api/trade2/search/${trade2state.realm}/${trade2state.league}`;
                     const searchUrl = `https://poe.game.qq.com/trade2/search/${trade2state.realm}/${trade2state.league}/`;
@@ -790,12 +801,49 @@ class Sidebar {
         this.createSidebarElement();
         this.attachEventListeners();
 
-        this.collectionsTree = new TreeView('collections-tree', 'poe2_collections');
-        this.searchesTree = new TreeView('searches-tree', 'poe2_searches');
+        this.checkVersion().then(() => {
+            this.collectionsTree = new TreeView('collections-tree', 'poe2_collections');
+            this.searchesTree = new TreeView('searches-tree', 'poe2_searches');
 
-        this.renderAffixLimitGrid();
-        this.loadState();
-        window.poe2SidebarInstance = this;
+            this.renderAffixLimitGrid();
+            this.loadState();
+            window.poe2SidebarInstance = this;
+        });
+    }
+
+    checkVersion() {
+        return new Promise((resolve) => {
+            const trade2state = getTrade2State();
+            const currentLeague = trade2state ? trade2state.league : null;
+
+            if (!currentLeague) {
+                resolve();
+                return;
+            }
+
+            chrome.storage.local.get(['version'], (result) => {
+                const storedVersion = result.version;
+
+                if (!storedVersion) {
+                    // Initialize version if missing
+                    chrome.storage.local.set({ version: currentLeague });
+                    console.log(`Version initialized to ${currentLeague}`);
+                    resolve();
+                } else if (storedVersion !== currentLeague) {
+                    if (confirm(`缓存数据已过期 (Version: ${storedVersion}, Current: ${currentLeague})，是否一键清空?`)) {
+                        chrome.storage.local.remove(['poe2_collections', 'poe2_searches', 'version'], () => {
+                            chrome.storage.local.set({ version: currentLeague });
+                            alert('缓存已清空');
+                            resolve();
+                        });
+                    } else {
+                        resolve();
+                    }
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 
     addSubscriptionToUI(id, url, name) {
@@ -1373,3 +1421,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 window.PoE2Sidebar = Sidebar;
+
+function getTrade2State() {
+    try {
+        const trade2stateStr = localStorage.getItem('lscache-trade2state');
+        if (trade2stateStr) {
+            return JSON.parse(trade2stateStr);
+        }
+    } catch (e) {
+        console.warn('Failed to parse lscache-trade2state:', e);
+    }
+    return null;
+}
