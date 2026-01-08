@@ -830,7 +830,7 @@ class Sidebar {
                     console.log(`Version initialized to ${currentLeague}`);
                     resolve();
                 } else if (storedVersion !== currentLeague) {
-                    if (confirm(`流放2助手 缓存数据已过期 (Version: ${storedVersion}, Current: ${currentLeague})，是否一键清空?`)) {
+                    if (confirm(`流放2助手 缓存数据已过期 (缓存版本: ${storedVersion}, 当前版本: ${currentLeague})，是否一键清空?`)) {
                         chrome.storage.local.remove(['poe2_collections', 'poe2_searches', 'version'], () => {
                             chrome.storage.local.set({ version: currentLeague });
                             alert('流放2助手 缓存已清空');
