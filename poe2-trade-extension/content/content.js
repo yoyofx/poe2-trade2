@@ -63,16 +63,16 @@ function toggleStar(btn, row) {
         btn.innerHTML = '★';
 
         // Extract Data
-        const itemData = extractItemData(row, itemId);
+        const searchCode = window.location.pathname.split('/').pop();
+        const itemData = extractItemData(row, itemId, searchCode);
         sidebar.addToCollection(itemData);
     }
 }
 
-function extractItemData(row, itemId) {
+function extractItemData(row, itemId, searchCode) {
     // Attempt to extract relevant data
     // This is highly dependent on the actual DOM structure of PoE Trade site
     // get row attribate , data-id
-    console.log(itemId)
 
     const nameEl = row.querySelector('.itemName') || row.querySelector('.name');
     const typeEl = row.querySelector('.itemType') || row.querySelector('.typeLine');
@@ -114,7 +114,8 @@ function extractItemData(row, itemId) {
         desecrates: desecrates,
         skills: skills,
         category: category,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        searchCode: searchCode,
     };
     console.log(a);
     return a;

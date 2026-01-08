@@ -305,9 +305,6 @@ class TreeView {
                     //取最后/后面的字符串
                     searchCode = searchCode.slice(searchCode.lastIndexOf('/') + 1);
 
-                    console.log('searchCode:', searchCode);
-
-
                     // Replace protocol for WebSocket
                     // Assuming original is https or http
                     let wsUrl = liveSearchApiUrl + searchCode;
@@ -326,7 +323,8 @@ class TreeView {
                                     title: node.name,
                                     message: `订阅发现了 ${data.count} 个符合条件新物品`,
                                     notificationId: searchCode,
-                                    queryItemId: data.result
+                                    queryItemId: data.result,
+                                    searchCode: searchCode
                                 });
                             }
 
@@ -564,7 +562,7 @@ class TreeView {
                 hideoutBtn.onclick = (e) => {
                     e.stopPropagation();
                     if (window.poe2SidebarInstance) {
-                        window.poe2SidebarInstance.jumpToHideout(node.data.id);
+                        window.poe2SidebarInstance.jumpToHideout(node.data.id, node.data.searchCode);
                     }
                 };
 
@@ -1276,7 +1274,7 @@ class Sidebar {
 
     funcjumpToHideout(request) {
         //fetch url by https://poe.game.qq.com/api/trade2/fetch/{request.queryItemId}?query=Rry0VrOi7&realm=poe2
-        const fetchUrl = `https://poe.game.qq.com/api/trade2/fetch/${request.queryItemId}?query=Rry0VrOi7&realm=poe2`;
+        const fetchUrl = `https://poe.game.qq.com/api/trade2/fetch/${request.queryItemId}?query=${request.searchCode}&realm=poe2`;
         fetch(fetchUrl)
             .then(response => response.json())
             .then(data => {
@@ -1318,7 +1316,7 @@ class Sidebar {
 
     }
 
-    jumpToHideout(itemId) {
+    jumpToHideout(itemId, searchCode) {
         const hideoutActionUrl = 'https://poe.game.qq.com/api/trade2/whisper';
         // Note: The query ID 'GvjbmPOUb' might need to be dynamic or fetched from state.
         // For now, using the one present in original code or try to get it from local storage state if possible?
@@ -1327,7 +1325,10 @@ class Sidebar {
         // Actually, the query parameter is required by the API to link the fetch to a search context.
         // We will try without it or use a placeholder if the original code had it hardcoded.
         // Original: query=GvjbmPOUb
-        const url = `https://poe.game.qq.com/api/trade2/fetch/${itemId}?query=GvjbmPOUb&realm=poe2`;
+        if (!searchCode) {
+            searchCode = 'GvjbmPOUb';
+        }
+        const url = `https://poe.game.qq.com/api/trade2/fetch/${itemId}?query=${searchCode}&realm=poe2`;
 
         fetch(url)
             .then(response => response.json())
