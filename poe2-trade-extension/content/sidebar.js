@@ -291,61 +291,12 @@ class TreeView {
                 subscribeBtn.setAttribute('data-tooltip', '订阅');
                 subscribeBtn.onclick = (e) => {
                     e.stopPropagation();
-
-                    const trade2state = getTrade2State();
-                    if (!trade2state) {
-                        alert('无法获取当前赛季信息，请刷新页面重试。');
-                        return;
-                    }
-                    const liveSearchApiUrl = `wss://poe.game.qq.com/api/trade2/live/${trade2state.realm}/${trade2state.league}/`;
-
-                    let searchCode = node.data.url;
-                    // Remove trailing slash if exists to avoid double slash issues or easy check
-                    if (searchCode.endsWith('/')) {
-                        searchCode = searchCode.slice(0, -1);
-                    }
-
-                    // Check if ends with /live
-                    if (searchCode.endsWith('/live')) {
-                        //remove /live
-                        searchCode = searchCode.slice(0, -5);
-                    }
-                    //取最后/后面的字符串
-                    searchCode = searchCode.slice(searchCode.lastIndexOf('/') + 1);
-
-                    // Replace protocol for WebSocket
-                    // Assuming original is https or http
-                    let wsUrl = liveSearchApiUrl + searchCode;
-
-                    console.log('Connecting to WebSocket:', wsUrl);
-
-                    if (window.subscriptionManager) {
-                        window.subscriptionManager.subscribe(searchCode, wsUrl, (sourceId, data) => {
-                            console.log(`[Callback] Message from ${sourceId}:`, data);
-
-                            if (data.result) {
-                                // Notify Background
-                                const itemId = data.result;
-                                chrome.runtime.sendMessage({
-                                    action: 'notify',
-                                    title: node.name,
-                                    message: `订阅发现了 ${data.count} 个符合条件新物品`,
-                                    notificationId: searchCode,
-                                    queryItemId: data.result,
-                                    searchCode: searchCode
-                                });
-                            }
-
-                        });
-
-                        if (window.poe2SidebarInstance) {
-                            window.poe2SidebarInstance.addSubscriptionToUI(searchCode, wsUrl, node.name);
-                        }
-                    } else {
-                        console.error('SubscriptionManager not found!');
-                        alert('订阅管理器未加载，请刷新页面重试。');
+                    // 直接执行订阅
+                    if (window.poe2SidebarInstance) {
+                        window.poe2SidebarInstance.executeSubscription(node);
                     }
                 };
+
                 actions.appendChild(subscribeBtn);
 
                 // Delete Button
@@ -1296,7 +1247,20 @@ class Sidebar {
             p.classList.remove('active');
         });
         this.container.querySelector(`#tab-${tabName}`).classList.add('active');
+
+        // 首次切换到搜索标签页时显示引导
+        if (tabName === 'searches') {
+            chrome.storage.local.get(['subscription_guide_shown'], (result) => {
+                if (!result.subscription_guide_shown) {
+                    // 延迟显示,确保 DOM 已渲染
+                    setTimeout(() => {
+                        this.showSubscriptionGuide();
+                    }, 300);
+                }
+            });
+        }
     }
+
 
     saveState() {
         // Save collapsed state to local storage if needed
@@ -1409,7 +1373,222 @@ class Sidebar {
             })
             .catch(err => console.error('Fetch error:', err));
     }
+
+    // 显示订阅功能分步骤引导
+    showSubscriptionGuide() {
+        const steps = [
+            {
+                title: '保存搜索',
+                icon: '💾',
+                content: '首先,点击<span class="guide-tooltip-highlight">"保存当前搜索"</span>按钮,可以将当前页面的搜索条件保存到收藏夹中,方便下次快速访问。',
+                target: '#btn-save-search',
+                position: 'bottom'
+            },
+            {
+                title: '订阅搜索',
+                icon: '📡',
+                content: '保存搜索后,点击搜索项右侧的<span class="guide-tooltip-highlight">订阅按钮 📡</span>,即可开启实时监控功能。',
+                target: '.btn-subscribe',
+                position: 'left'
+            },
+            {
+                title: '订阅管理',
+                icon: '📋',
+                content: '所有已订阅的搜索会显示在顶部的<span class="guide-tooltip-highlight">"订阅管理"</span>区域,您可以随时查看和取消订阅。',
+                target: '#section-subscription-management',
+                position: 'bottom'
+            },
+            {
+                title: '重要提示',
+                icon: '💡',
+                content: '订阅功能通过 WebSocket 实时监听搜索结果,当有新物品符合条件时会立即通知您。<br><br><span class="guide-tooltip-highlight">注意:需要保持浏览器标签页打开才能正常工作。</span>',
+                target: null,
+                position: 'center'
+            }
+        ];
+
+        let currentStep = 0;
+        let overlay, highlight, tooltip;
+
+        const createGuideUI = () => {
+            // 创建遮罩层
+            overlay = document.createElement('div');
+            overlay.className = 'subscription-guide-overlay';
+
+            // 创建高亮框
+            highlight = document.createElement('div');
+            highlight.className = 'subscription-guide-highlight';
+
+            // 创建提示气泡
+            tooltip = document.createElement('div');
+            tooltip.className = 'subscription-guide-tooltip';
+
+            document.body.appendChild(overlay);
+            document.body.appendChild(highlight);
+            document.body.appendChild(tooltip);
+        };
+
+        const updateStep = () => {
+            const step = steps[currentStep];
+
+            // 更新气泡内容
+            tooltip.innerHTML = `
+                <div class="guide-tooltip-header">
+                    <div class="guide-tooltip-icon">${step.icon}</div>
+                    <div class="guide-tooltip-title">${step.title}</div>
+                </div>
+                <div class="guide-step-indicator">
+                    ${steps.map((_, i) => `<div class="guide-step-dot ${i === currentStep ? 'active' : ''}"></div>`).join('')}
+                </div>
+                <div class="guide-tooltip-content">
+                    <p>${step.content}</p>
+                </div>
+                <div class="guide-tooltip-footer">
+                    <div class="guide-step-counter">${currentStep + 1} / ${steps.length}</div>
+                    <button class="guide-tooltip-btn">${currentStep === steps.length - 1 ? '完成' : '下一步'}</button>
+                </div>
+            `;
+
+            // 绑定按钮事件
+            const btn = tooltip.querySelector('.guide-tooltip-btn');
+            btn.onclick = () => {
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    updateStep();
+                } else {
+                    closeGuide();
+                }
+            };
+
+            // 更新高亮位置
+            if (step.target) {
+                const targetEl = this.container.querySelector(step.target);
+                if (targetEl) {
+                    const rect = targetEl.getBoundingClientRect();
+                    highlight.style.display = 'block';
+                    highlight.style.top = `${rect.top - 4}px`;
+                    highlight.style.left = `${rect.left - 4}px`;
+                    highlight.style.width = `${rect.width + 8}px`;
+                    highlight.style.height = `${rect.height + 8}px`;
+
+                    // 定位气泡
+                    positionTooltip(rect, step.position);
+                } else {
+                    highlight.style.display = 'none';
+                    positionTooltipCenter();
+                }
+            } else {
+                highlight.style.display = 'none';
+                positionTooltipCenter();
+            }
+        };
+
+        const positionTooltip = (targetRect, position) => {
+            tooltip.className = 'subscription-guide-tooltip';
+            const tooltipRect = tooltip.getBoundingClientRect();
+
+            switch (position) {
+                case 'bottom':
+                    tooltip.classList.add('arrow-top');
+                    tooltip.style.top = `${targetRect.bottom + 20}px`;
+                    tooltip.style.left = `${targetRect.left + targetRect.width / 2 - tooltipRect.width / 2}px`;
+                    break;
+                case 'top':
+                    tooltip.classList.add('arrow-bottom');
+                    tooltip.style.top = `${targetRect.top - tooltipRect.height - 20}px`;
+                    tooltip.style.left = `${targetRect.left + targetRect.width / 2 - tooltipRect.width / 2}px`;
+                    break;
+                case 'left':
+                    tooltip.classList.add('arrow-right');
+                    tooltip.style.top = `${targetRect.top + targetRect.height / 2 - tooltipRect.height / 2}px`;
+                    tooltip.style.left = `${targetRect.left - tooltipRect.width - 20}px`;
+                    break;
+                case 'right':
+                    tooltip.classList.add('arrow-left');
+                    tooltip.style.top = `${targetRect.top + targetRect.height / 2 - tooltipRect.height / 2}px`;
+                    tooltip.style.left = `${targetRect.right + 20}px`;
+                    break;
+            }
+        };
+
+        const positionTooltipCenter = () => {
+            tooltip.className = 'subscription-guide-tooltip';
+            tooltip.style.top = '50%';
+            tooltip.style.left = '50%';
+            tooltip.style.transform = 'translate(-50%, -50%)';
+        };
+
+        const closeGuide = () => {
+            overlay.remove();
+            highlight.remove();
+            tooltip.remove();
+            // 标记用户已完成引导
+            chrome.storage.local.set({ subscription_guide_shown: true });
+        };
+
+        // 初始化
+        createGuideUI();
+        updateStep();
+    }
+
+    // 执行订阅操作
+    executeSubscription(node) {
+        const trade2state = getTrade2State();
+        if (!trade2state) {
+            alert('无法获取当前赛季信息,请刷新页面重试。');
+            return;
+        }
+        const liveSearchApiUrl = `wss://poe.game.qq.com/api/trade2/live/${trade2state.realm}/${trade2state.league}/`;
+
+        let searchCode = node.data.url;
+        // Remove trailing slash if exists to avoid double slash issues or easy check
+        if (searchCode.endsWith('/')) {
+            searchCode = searchCode.slice(0, -1);
+        }
+
+        // Check if ends with /live
+        if (searchCode.endsWith('/live')) {
+            //remove /live
+            searchCode = searchCode.slice(0, -5);
+        }
+        //取最后/后面的字符串
+        searchCode = searchCode.slice(searchCode.lastIndexOf('/') + 1);
+
+        // Replace protocol for WebSocket
+        // Assuming original is https or http
+        let wsUrl = liveSearchApiUrl + searchCode;
+
+        console.log('Connecting to WebSocket:', wsUrl);
+
+        if (window.subscriptionManager) {
+            window.subscriptionManager.subscribe(searchCode, wsUrl, (sourceId, data) => {
+                console.log(`[Callback] Message from ${sourceId}:`, data);
+
+                if (data.result) {
+                    // Notify Background
+                    const itemId = data.result;
+                    chrome.runtime.sendMessage({
+                        action: 'notify',
+                        title: node.name,
+                        message: `订阅发现了 ${data.count} 个符合条件新物品`,
+                        notificationId: searchCode,
+                        queryItemId: data.result,
+                        searchCode: searchCode
+                    });
+                }
+
+            });
+
+            if (window.poe2SidebarInstance) {
+                window.poe2SidebarInstance.addSubscriptionToUI(searchCode, wsUrl, node.name);
+            }
+        } else {
+            console.error('SubscriptionManager not found!');
+            alert('订阅管理器未加载,请刷新页面重试。');
+        }
+    }
 }
+
 
 // Global Message Listener for Notification Actions
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
