@@ -874,13 +874,18 @@ class Sidebar {
                 row.classList.add('mod-source-normal');
             } else if (affix.source === 'desecrated') {
                 row.classList.add('mod-source-desecrated');
+            } else if (affix.source === 'essence') {
+                row.classList.add('mod-source-essence');
+            } else if (affix.source === 'perfect_essence') {
+                row.classList.add('mod-source-perfect_essence');
             }
 
             row.textContent = affix.sign;
             scroll.appendChild(row);
         });
 
-        panel.style.display = 'block';
+        // 使用 flex 而不是 block,保持弹性布局
+        panel.style.display = 'flex';
 
     }
 

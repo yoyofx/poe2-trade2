@@ -145,6 +145,13 @@
     padding: 0;
     overflow: hidden;
     animation: fadeIn 0.3s ease;
+    /* 使用弹性布局 */
+    display: flex;
+    flex-direction: column;
+    /* 放宽最大高度限制,父容器已经正确处理高度 */
+    max-height: 400px;
+    /* 允许在空间不足时适度收缩 */
+    flex-shrink: 1;
 }
 
 .affix-info-header {
@@ -157,6 +164,8 @@
     font-size: 13px;
     font-weight: bold;
     color: var(--accent-gold);
+    /* 固定头部高度 */
+    flex-shrink: 0;
 }
 
 .affix-info-close {
@@ -172,9 +181,15 @@
 }
 
 .affix-info-scroll {
-    max-height: 300px;
+    /* 移除固定的 max-height,让它自适应 */
+    flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 5px;
+    /* 添加底部 padding,确保最后一个 item 完全可见 */
+    padding-bottom: 10px;
+    /* 确保有明确的高度以触发滚动 */
+    min-height: 0;
 }
 
 .affix-info-item {
@@ -186,6 +201,8 @@
 
 .affix-info-item:last-child {
     border-bottom: none;
+    /* 添加小的底部 margin 作为安全边距 */
+    margin-bottom: 5px;
 }
 
 .mod-source-normal {
@@ -195,6 +212,16 @@
 .mod-source-desecrated {
     color: #5f5;
     /* Bright Green */
+}
+
+.mod-source-essence {
+    color: #c77dff;
+    /* Purple for Essence */
+}
+
+.mod-source-perfect_essence {
+    color: #ffd700;
+    /* Gold for Perfect Essence */
 }
 
 /* Sidebar Sections */
@@ -245,17 +272,25 @@
     background-color: #0f0f0f;
     display: flex;
     flex-direction: column;
+    /* 关键修复:允许 flex 子元素收缩到小于内容高度 */
+    min-height: 0;
 }
 
 .tab-pane {
     display: none;
-    height: 100%;
+    /* 移除 height: 100%,避免与 flex 布局冲突 */
 }
 
 .tab-pane.active {
     display: flex;
     flex-direction: column;
     animation: fadeIn 0.3s ease;
+    /* 使用 flex: 1 而不是 height: 100%,确保正确填充可用空间 */
+    flex: 1;
+    /* 关键:允许 flex 子元素正确收缩 */
+    min-height: 0;
+    /* 确保内容可以滚动 */
+    overflow: hidden;
 }
 
 /* Sticky Header Wrapper */
@@ -283,14 +318,19 @@
 /* Tree View Container */
 /* Tree View Container & Scrollbars */
 .tree-root,
-.affix-limit-content,
-.affix-info-scroll {
+.affix-limit-content {
     flex: 1;
     /* Take remaining height */
     overflow-y: auto;
     /* Scroll internally */
     padding-right: 5px;
     /* Spacing for scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-gold-dim) #1a1a1a;
+}
+
+/* affix-info-scroll 单独设置滚动条样式 */
+.affix-info-scroll {
     scrollbar-width: thin;
     scrollbar-color: var(--accent-gold-dim) #1a1a1a;
 }
@@ -1237,9 +1277,28 @@
     flex: 1 1 auto;
 }
 
-/* Enhancements don't grow, just take content space */
+/* Enhancements section - allow scrolling when content overflows */
 #section-search-enhancements {
-    flex-shrink: 0;
+    /* 关键修复:允许收缩以适应可用空间 */
+    flex-shrink: 1;
+    display: flex;
+    flex-direction: column;
+    /* 限制最大高度 */
+    max-height: 70vh;
+    /* 允许收缩 */
+    min-height: 0;
+}
+
+#section-search-enhancements .sidebar-section-content {
+    /* 关键修复:使用 flex: 1 让它填充剩余空间 */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* 允许内容滚动 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* 确保有明确的高度以触发滚动 */
+    min-height: 0;
 }
 
 .tree-header:hover .tree-actions {

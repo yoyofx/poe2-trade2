@@ -438,8 +438,9 @@ function extractPrefixesAndSuffixes(data) {
     const prefixMap = new Map();
     const suffixMap = new Map();
 
-    // 只处理 normal 普通词缀 和 desecrated 渎灵词缀 两个字段
-    const sources = ['normal', 'desecrated'];
+    // 只处理 normal 基础词缀 和 desecrated 渎灵词缀 和 essence 精华词缀 和 perfect_essence 完美精华词缀 四个字段
+    // 没有处理的有 bonded 绑定词缀， corrupted 腐化词缀， socketable 增幅器词缀
+    const sources = ['normal', 'desecrated', 'essence', 'perfect_essence'];
 
     sources.forEach(source => {
         if (data[source] && Array.isArray(data[source])) {
