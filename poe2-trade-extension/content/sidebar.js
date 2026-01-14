@@ -878,9 +878,26 @@ class Sidebar {
                 row.classList.add('mod-source-essence');
             } else if (affix.source === 'perfect_essence') {
                 row.classList.add('mod-source-perfect_essence');
+            } else if (affix.source === 'bonded') {
+                row.classList.add('mod-source-bonded');
+            } else if (affix.source === 'corrupted') {
+                row.classList.add('mod-source-corrupted');
+            } else if (affix.source === 'socketable') {
+                row.classList.add('mod-source-socketable');
             }
 
-            row.textContent = affix.sign;
+            // 映射 source 到中文
+            const sourceMap = {
+                'normal': '普通',
+                'desecrated': '亵渎',
+                'essence': '精华',
+                'perfect_essence': '完美精华',
+                'bonded': '绑定词缀',
+                'corrupted': '腐化词缀',
+                'socketable': '增幅器词缀'
+            };
+            const sourceCN = sourceMap[affix.source] || affix.source;
+            row.textContent = affix.source === 'normal' ? affix.sign : `【${sourceCN}】${affix.sign}`;
             scroll.appendChild(row);
         });
 
