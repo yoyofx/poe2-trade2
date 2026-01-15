@@ -4,7 +4,15 @@ class TreeView {
         this.storageKey = storageKey;
         this.data = []; // Array of nodes
         this.selectedNodeId = null;
+        this.draggedNodeId = null;
         this.load();
+
+        // F2 Rename Listener
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F2' && this.selectedNodeId && this.container.offsetParent !== null) {
+                this.renameNode(this.selectedNodeId);
+            }
+        });
     }
 
     load() {
@@ -121,8 +129,83 @@ class TreeView {
         this.render();
     }
 
+    renameNode(id) {
+        const node = this.findNode(id, this.data);
+        if (node) {
+            const newName = prompt('重命名:', node.name);
+            if (newName && newName.trim() !== '') {
+                node.name = newName;
+                this.save();
+            }
+        }
+    }
+
+    findNodeAndParent(id, nodes) {
+        for (let i = 0; i < nodes.length; i++) {
+            if (nodes[i].id === id) {
+                return { node: nodes[i], parentArray: nodes };
+            }
+            if (nodes[i].children) {
+                const result = this.findNodeAndParent(id, nodes[i].children);
+                if (result) return result;
+            }
+        }
+        return null;
+    }
+
+    isDescendant(parentId, childId) {
+        const parent = this.findNode(parentId, this.data);
+        if (!parent || !parent.children) return false;
+        return this.findNode(childId, parent.children) !== null;
+    }
+
+    moveNode(nodeId, targetId) {
+        if (nodeId === targetId) return;
+        if (this.isDescendant(nodeId, targetId)) {
+            alert('无法将文件夹移动到其子文件夹中');
+            return;
+        }
+
+        const source = this.findNodeAndParent(nodeId, this.data);
+        if (!source) return;
+
+        let targetParentChildren = null;
+        let targetNode = null;
+
+        if (targetId === 'root') {
+            targetParentChildren = this.data;
+        } else {
+            targetNode = this.findNode(targetId, this.data);
+            if (!targetNode || targetNode.type !== 'folder') return;
+            if (!targetNode.children) targetNode.children = [];
+            targetParentChildren = targetNode.children;
+        }
+
+        const index = source.parentArray.indexOf(source.node);
+        if (index > -1) {
+            source.parentArray.splice(index, 1);
+        }
+
+        targetParentChildren.push(source.node);
+        if (targetNode) targetNode.expanded = true;
+        this.save();
+    }
+
     render() {
         this.container.innerHTML = '';
+        
+        // Root Drop Zone
+        this.container.ondragover = (e) => {
+            e.preventDefault();
+        };
+        this.container.ondrop = (e) => {
+            e.preventDefault();
+            if (e.target === this.container) {
+                 const draggedId = this.draggedNodeId;
+                 if (draggedId) this.moveNode(draggedId, 'root');
+            }
+        };
+
         this.data.forEach(node => {
             this.container.appendChild(this.createNodeElement(node));
         });
@@ -133,6 +216,41 @@ class TreeView {
         el.className = 'tree-node';
         if (node.type === 'item') {
             el.classList.add('item-node');
+        }
+
+        // Drag and Drop Logic
+        el.setAttribute('draggable', 'true');
+        el.ondragstart = (e) => {
+            this.draggedNodeId = node.id;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', node.id);
+            e.stopPropagation();
+            setTimeout(() => el.classList.add('dragging'), 0);
+        };
+        el.ondragend = (e) => {
+            el.classList.remove('dragging');
+            this.draggedNodeId = null;
+        };
+
+        if (node.type === 'folder') {
+            el.ondragover = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (this.draggedNodeId !== node.id) {
+                     el.classList.add('drag-over');
+                }
+            };
+            el.ondragleave = (e) => {
+                el.classList.remove('drag-over');
+            };
+            el.ondrop = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                el.classList.remove('drag-over');
+                if (this.draggedNodeId) {
+                    this.moveNode(this.draggedNodeId, node.id);
+                }
+            };
         }
 
         // ============================================
@@ -298,6 +416,17 @@ class TreeView {
                 };
 
                 actions.appendChild(subscribeBtn);
+
+                // Rename Button
+                const renameBtn = document.createElement('button');
+                renameBtn.className = 'footer-action-btn btn-rename tooltip-btn';
+                renameBtn.innerHTML = '✎';
+                renameBtn.setAttribute('data-tooltip', '重命名');
+                renameBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    this.renameNode(node.id);
+                };
+                actions.appendChild(renameBtn);
 
                 // Delete Button
                 const deleteBtn = document.createElement('button');
@@ -526,6 +655,17 @@ class TreeView {
                 };
 
                 actions.appendChild(hideoutBtn);
+
+                // Rename button
+                const renameBtn = document.createElement('button');
+                renameBtn.className = 'footer-action-btn btn-rename tooltip-btn';
+                renameBtn.innerHTML = '✎';
+                renameBtn.setAttribute('data-tooltip', '重命名');
+                renameBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    this.renameNode(node.id);
+                };
+                actions.appendChild(renameBtn);
 
                 // Delete button
                 const deleteBtn = document.createElement('button');
