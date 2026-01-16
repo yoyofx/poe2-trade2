@@ -1,0 +1,59 @@
+// Cache to store request data by notificationId
+const notificationData = new Map();
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'fetchUrl') {
+        fetch(request.url)
+            .then(response => response.text())
+            .then(data => sendResponse({ success: true, data: data }))
+            .catch(error => sendResponse({ success: false, error: error.toString() }));
+        return true; // Keep the message channel open for sendResponse
+    } else if (request.action === 'notify') {
+        const now = new Date();
+        const isoString = now.toISOString();
+        const notificationId = request.notificationId || ('poe2-notify-' + isoString);
+
+        request._sourceTabId = sender.tab ? sender.tab.id : null;
+        notificationData.set(notificationId, request);
+
+        chrome.notifications.create(notificationId, {
+            type: 'basic',
+            iconUrl: 'poe2_icon.png',
+            title: request.title || '新物品提醒',
+            message: request.message || '发现新物品!',
+            buttons: [
+                { title: '取消' },
+                { title: '立即跳转到藏身处' }
+            ],
+            requireInteraction: true
+        }, (notificationId) => {
+            if (chrome.runtime.lastError) {
+                console.error("Notification Error:", chrome.runtime.lastError);
+                notificationData.delete(notificationId);
+            }
+        });
+    }
+});
+
+chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+    const request = notificationData.get(notificationId);
+    
+    if (buttonIndex === 1) { // 立即跳转
+        if (request && request._sourceTabId) {
+            chrome.tabs.update(request._sourceTabId, { active: true });
+            chrome.tabs.sendMessage(request._sourceTabId, { action: 'jumpToHideout', request: request });
+        } else {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (tabs.length > 0) {
+                    chrome.tabs.sendMessage(tabs[0].id, { action: 'jumpToHideout', request: request });
+                }
+            });
+        }
+    }
+    chrome.notifications.clear(notificationId);
+    notificationData.delete(notificationId);
+});
+
+chrome.notifications.onClosed.addListener((notificationId) => {
+    notificationData.delete(notificationId);
+});

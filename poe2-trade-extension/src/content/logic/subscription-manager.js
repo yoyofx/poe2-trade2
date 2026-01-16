@@ -1,4 +1,4 @@
-class SubscriptionManager {
+export class SubscriptionManager {
     constructor(maxSubscriptions = 5) {
         this.maxSubscriptions = maxSubscriptions;
         this.subscriptions = new Map(); // id -> WebSocket
@@ -70,5 +70,5 @@ class SubscriptionManager {
     }
 }
 
-// Global instance
-window.subscriptionManager = new SubscriptionManager();
+// Singleton instance
+export const subscriptionManager = new SubscriptionManager();

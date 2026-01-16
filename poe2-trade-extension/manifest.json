@@ -1,43 +1,26 @@
 {
-    "manifest_version": 3,
-    "name": "流放2国服集市助手",
-    "version": "1.5.1",
-    "description": "POE流放2国服集市助手",
-    "permissions": [
-        "storage",
-        "activeTab",
-        "notifications"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "*://poe.game.qq.com/trade2/*"
-            ],
-            "js": [
-                "content/subscription_manager.js",
-                "content/sidebar.js",
-                "content/content.js"
-            ],
-            "css": [
-                "content/content.css"
-            ],
-            "run_at": "document_end"
-        }
-    ],
-    "background": {
-        "service_worker": "background.js"
-    },
-    "host_permissions": [
-        "https://poe2db.tw/*"
-    ],
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "content/content.css"
-            ],
-            "matches": [
-                "*://poe.game.qq.com/*"
-            ]
-        }
-    ]
+  "manifest_version": 3,
+  "name": "流放2国服集市助手",
+  "version": "1.5.1",
+  "description": "POE流放2国服集市助手",
+  "permissions": ["storage", "activeTab", "notifications"],
+  "content_scripts": [
+    {
+      "matches": ["*://poe.game.qq.com/trade2/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "host_permissions": ["https://poe2db.tw/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["content.css", "poe2_icon.png"],
+      "matches": ["*://poe.game.qq.com/*"]
+    }
+  ]
 }

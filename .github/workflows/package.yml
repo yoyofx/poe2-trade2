@@ -21,11 +21,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create ZIP archive
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
         run: |
           cd poe2-trade-extension
-          zip -r ../poe2-trade-extension.zip ./*
-          cd ..
+          npm install
+
+      - name: Build extension
+        run: |
+          cd poe2-trade-extension
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            npm run build:prod
+          else
+            npm run build
+          fi
+
+      - name: Create ZIP archive
+        run: |
+          cd poe2-trade-extension/dist
+          zip -r ../../poe2-trade-extension.zip ./*
+          cd ../..
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
